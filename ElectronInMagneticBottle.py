@@ -1,8 +1,8 @@
 # Tom Gade
-# Senior Research Project
 # Electron in a Magnetic Bottle
 # v2.0.21Nov13
 # Works on Python 2.7 ONLY (as of now), and VPython 6
+# Written as part of a research project at the Citadel, 2008-2009
 
 # Modules
 from __future__ import division
