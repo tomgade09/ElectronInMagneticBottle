@@ -105,20 +105,11 @@ def main():
 
     electron=sphere(pos=(Px,Py,Pz), radius=0.0000001, color=color.green,
         make_trail=True, trail_type="points", interval=10, retain=100)
-
-    # Approximation for Magnetic Field Lines
-    flxpt = []
-    flypt = []
-    flxpt = range(-50,50,1)  #Field Line Approximation
-    for i in range(len(flxpt)):
-        flxpt.append(flxpt.pop(0)/10)
-    for i in range(len(flxpt)):
-        flypt.append(4/cosh(.3*flxpt[i]))
-    for i in range(len(flxpt)):
-        points(pos=(flxpt[i],flypt[i],0), size=5, color=color.red)
-        points(pos=(flxpt[i],-flypt[i],0), size=5, color=color.red)
-        points(pos=(flxpt[i],0,flypt[i]), size=5, color=color.red)
-        points(pos=(flxpt[i],0,-flypt[i]), size=5, color=color.red)
+    
+    # Calculate B Field Lines from given points
+    linedist = 0.001
+    
+    # End B Field Lines Code
         
     while t <= .001:
         rate(10000)
