@@ -99,31 +99,6 @@ while t <= .001:
                                         (Py-R*cos(a))**2+
                                         (Pz-R*sin(a))**2)**(3/2))
 
-    # Define Arrays (and clear data if it exists)
-    rx = []
-    ry = []
-    rz = []
-    rxn = []
-    rmag = []
-    rnmag = []
-    dsxrx = []
-    dsxry = []
-    dsxrz = []
-    dsxryn = []
-    dsxrzn = []
-    dBx = []
-    dBy = []
-    dBz = []
-    dBxn = []
-    dByn = []
-    dBzn = []
-    Bxvar = 0                                       #Comps of B from Right Coil [T]
-    Byvar = 0
-    Bzvar = 0
-    Bxnvar = 0                                      #Comps of B from Left Coil [T]
-    Bynvar = 0
-    Bznvar = 0
-
     # Integrate Functions Iteratively
     lfBx = integrate.quad(lfdBx, 0, 2*pi)
     lfBy = integrate.quad(lfdBy, 0, 2*pi)
