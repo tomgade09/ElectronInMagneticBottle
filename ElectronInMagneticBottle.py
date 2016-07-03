@@ -15,30 +15,30 @@ dt = 5*10**-9                      #Time slice [s]
 d = 5                              #Half distance between coils [cm]
 R = 5                              #Radius of coil [cm]
 
-def calcBcoils(Px, Py, Pz):
+def calcBcoils(px, py, pz):
     N = 1                              #Number of turns of wire in coil [None]
     I = 1                              #Current [A]
     eta = float(N*I*10**(-5))          #Constant "muo * I * 10^2 / 4 * pi" [T*cm]
     
     #Equations to Integrate
-    lfdBx = lambda a: eta*(-R*Pz*sin(a)-R*Py*cos(a)+R**2)/(((Px+d)**2+
-                                                       (Py-R*cos(a))**2+
-                                                       (Pz-R*sin(a))**2)**(3/2))
-    rtdBx = lambda a: eta*(-R*Pz*sin(a)-R*Py*cos(a)+R**2)/(((Px-d)**2+
-                                                       (Py-R*cos(a))**2+
-                                                       (Pz-R*sin(a))**2)**(3/2))
-    lfdBy = lambda a: eta*(R*cos(a)*(Px+d))/(((Px+d)**2+
-                                        (Py-R*cos(a))**2+
-                                        (Pz-R*sin(a))**2)**(3/2))
-    rtdBy = lambda a: eta*(R*cos(a)*(Px-d))/(((Px-d)**2+
-                                        (Py-R*cos(a))**2+
-                                        (Pz-R*sin(a))**2)**(3/2))
-    lfdBz = lambda a: eta*(R*sin(a)*(Px+d))/(((Px+d)**2+
-                                        (Py-R*cos(a))**2+
-                                        (Pz-R*sin(a))**2)**(3/2))
-    rtdBz = lambda a: eta*(R*sin(a)*(Px-d))/(((Px-d)**2+
-                                        (Py-R*cos(a))**2+
-                                        (Pz-R*sin(a))**2)**(3/2))
+    lfdBx = lambda a: eta*(-R*pz*sin(a)-R*py*cos(a)+R**2)/(((px+d)**2+
+                                                       (py-R*cos(a))**2+
+                                                       (pz-R*sin(a))**2)**(3/2))
+    rtdBx = lambda a: eta*(-R*pz*sin(a)-R*py*cos(a)+R**2)/(((px-d)**2+
+                                                       (py-R*cos(a))**2+
+                                                       (pz-R*sin(a))**2)**(3/2))
+    lfdBy = lambda a: eta*(R*cos(a)*(px+d))/(((px+d)**2+
+                                        (py-R*cos(a))**2+
+                                        (pz-R*sin(a))**2)**(3/2))
+    rtdBy = lambda a: eta*(R*cos(a)*(px-d))/(((px-d)**2+
+                                        (py-R*cos(a))**2+
+                                        (pz-R*sin(a))**2)**(3/2))
+    lfdBz = lambda a: eta*(R*sin(a)*(px+d))/(((px+d)**2+
+                                        (py-R*cos(a))**2+
+                                        (pz-R*sin(a))**2)**(3/2))
+    rtdBz = lambda a: eta*(R*sin(a)*(px-d))/(((px-d)**2+
+                                        (py-R*cos(a))**2+
+                                        (pz-R*sin(a))**2)**(3/2))
                                         
     # Integrate Functions Iteratively
     lfBx = integrate.quad(lfdBx, 0, 2*pi)
@@ -48,18 +48,18 @@ def calcBcoils(Px, Py, Pz):
     rtBy = integrate.quad(rtdBy, 0, 2*pi)
     rtBz = integrate.quad(rtdBz, 0, 2*pi)
 
-    # Add B from Left Loop to Right Loop (Using Superposition Principle)
-    Bx = lfBx[0] + rtBx[0]
-    By = lfBy[0] + rtBy[0]
-    Bz = lfBz[0] + rtBz[0]
+    # Find total B
+    bx = lfBx[0] + rtBx[0]
+    by = lfBy[0] + rtBy[0]
+    bz = lfBz[0] + rtBz[0]
     
-    return Bx, By, Bz
+    return bx, by, bz
     
-def calcV(Bx, By, Bz, vx, vy, vz):
+def calcV(bx, by, bz, vx, vy, vz):
     # Calculating B's Effect on the Electron's Velocity
-    vXB_x = vy*Bz - vz*By     #cmpts of v cross B [T*cm/s]
-    vXB_y = vz*Bx - vx*Bz
-    vXB_z = vx*By - vy*Bx
+    vXB_x = vy*bz - vz*by     #cmpts of v cross B [T*cm/s]
+    vXB_y = vz*bx - vx*bz
+    vXB_z = vx*by - vy*bx
     ax = -eom * vXB_x         #cmpts of acceleration [cm/s2]
     ay = -eom * vXB_y
     az = -eom * vXB_z
@@ -69,20 +69,20 @@ def calcV(Bx, By, Bz, vx, vy, vz):
     
     return vx, vy, vz
     
-def calcP(Px, Py, Pz, vx, vy, vz):
-    # Iterate Time Forward dt, Calculate New Position, Index
-    Px += vx*dt              #cmpts of new position [cm]
-    Py += vy*dt
-    Pz += vz*dt
+def calcP(px, py, pz, vx, vy, vz):
+    # Iterate Time Forward dt, Calculate New Position
+    px += vx*dt              #cmpts of new position [cm]
+    py += vy*dt
+    pz += vz*dt
     
-    return Px, Py, Pz
+    return px, py, pz
     
 def main():
     ind = 0                            #Index (Calculation Counter)
     t = 0                              #Initial time [s]
-    vx = 100                           #Initial Electron Velocity [cm/s]
-    vy = 100
-    vz = 100
+    Vx = 100                           #Initial Electron Velocity [cm/s]
+    Vy = 100
+    Vz = 100
     Px = -4.75                         #Initial Electron Position [cm]
     Py = 0
     Pz = 0
@@ -110,12 +110,12 @@ def main():
         
     while t <= .001:
         Bx, By, Bz = calcBcoils(Px, Py, Pz)
-        vx, vy, vz = calcV(Bx, By, Bz, vx, vy, vz)
-        Px, Py, Pz = calcP(Px, Py, Pz, vx, vy, vz)
-        print Bx, By, Bz
-        print vx, vy, vz
-        print Px, Py, Pz
-        print "---------"
+        Vx, Vy, Vz = calcV(Bx, By, Bz, Vx, Vy, Vz)
+        Px, Py, Pz = calcP(Px, Py, Pz, Vx, Vy, Vz)
+        #print Bx, By, Bz
+        #print Vx, Vy, Vz
+        #print Px, Py, Pz
+        #print "---------"
         t += dt                  #time increase [s]
         ind += 1                 #index increase
         electron.pos=(Px,Py,Pz)   
