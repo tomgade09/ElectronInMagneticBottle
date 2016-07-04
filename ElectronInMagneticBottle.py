@@ -1,6 +1,6 @@
 # Tom Gade
 # Electron in a Magnetic Bottle
-# v3.0.0 03Jul16
+# v3.1.0 03Jul16
 # Works on Python 2.7 ONLY (as of now), and VPython 6
 # Written as part of a Senior research project at the Citadel, 2008-2009
 
@@ -76,7 +76,32 @@ def calcP(px, py, pz, vx, vy, vz):
     pz += vz*dt
     
     return px, py, pz
+
+def drawBlines(Po_x, Po_y, Po_z, linedist):
+    px = Po_x
+    py = Po_y
+    pz = Po_z
     
+    while px < 5:
+        bx, by, bz = calcBcoils(px, py, pz)
+        normfact = linedist / sqrt(bx**2 + by**2 + bz**2)
+        
+        print normfact
+        
+        bxn = bx * normfact
+        byn = by * normfact
+        bzn = bz * normfact
+        
+        arrow(pos=(px, py, pz), axis=(bxn, byn, bzn), color=color.red, headwidth=0.001, 
+            headlength=0.001, shaftwidth=0.01)
+            
+        #arrow(pos=(px, py, pz), axis=(bx*10000, by*10000, bz*10000), color=color.cyan, 
+        #    headwidth=0.001, headlength=0.001, shaftwidth=0.01)
+        
+        px += bxn
+        py += byn
+        pz += bzn
+
 def main():
     ind = 0                            #Index (Calculation Counter)
     t = 0                              #Initial time [s]
@@ -107,7 +132,10 @@ def main():
         make_trail=True, trail_type="points", interval=10, retain=100)
     
     # Calculate B Field Lines from given points
-    linedist = 0.001
+    drawBlines(-5, 0, -3.5, 0.1)
+    drawBlines(-5, -3.5, 0, 0.1)
+    drawBlines(-5, 0, 3.5, 0.1)
+    drawBlines(-5, 3.5, 0, 0.1)
     
     # End B Field Lines Code
         
