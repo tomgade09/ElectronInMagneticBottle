@@ -84,10 +84,10 @@ def drawBlines(Po_x, Po_y, Po_z, linedist):
     
     while px < 5:
         bx, by, bz = calcBcoils(px, py, pz)
-        normfact = linedist / sqrt(bx**2 + by**2 + bz**2)
+        #normfact = linedist / sqrt(bx**2 + by**2 + bz**2)
         
         #print normfact
-        
+        normfact = 10000
         bxn = bx * normfact
         byn = by * normfact
         bzn = bz * normfact
@@ -130,6 +130,8 @@ def main():
 
     electron=sphere(pos=(Px,Py,Pz), radius=0.0000001, color=color.green,
         make_trail=True, trail_type="points", interval=10, retain=100)
+        
+    relTclock = label(pos=(-6.5, 0, 0), text='t = ' + str(t) + ' s')
     
     # Calculate B Field Lines from given points
     drawBlines(-5, 0, -3.5, 0.1)
@@ -150,7 +152,8 @@ def main():
         #print "---------"
         t += dt                  #time increase [s]
         ind += 1                 #index increase
-        electron.pos=(Px,Py,Pz)   
+        electron.pos=(Px,Py,Pz)
+        relTclock.text = 't = ' + str(t) + ' s'
 
 if __name__ == "__main__":
     main()
