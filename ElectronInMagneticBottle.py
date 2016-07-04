@@ -85,9 +85,8 @@ def drawBlines(Po_x, Po_y, Po_z, linedist):
     while px < 5:
         bx, by, bz = calcBcoils(px, py, pz)
         #normfact = linedist / sqrt(bx**2 + by**2 + bz**2)
-        
-        #print normfact
         normfact = 10000
+        
         bxn = bx * normfact
         byn = by * normfact
         bzn = bz * normfact
@@ -138,18 +137,12 @@ def main():
     drawBlines(-5, -3.5, 0, 0.1)
     drawBlines(-5, 0, 3.5, 0.1)
     drawBlines(-5, 3.5, 0, 0.1)
-    
-    # End B Field Lines Code
         
     while t <= .001:
         rate(10000)
         Bx, By, Bz = calcBcoils(Px, Py, Pz)
         Vx, Vy, Vz = calcV(Bx, By, Bz, Vx, Vy, Vz)
         Px, Py, Pz = calcP(Px, Py, Pz, Vx, Vy, Vz)
-        #print Bx, By, Bz
-        #print Vx, Vy, Vz
-        #print Px, Py, Pz
-        #print "---------"
         t += dt                  #time increase [s]
         ind += 1                 #index increase
         electron.pos=(Px,Py,Pz)
