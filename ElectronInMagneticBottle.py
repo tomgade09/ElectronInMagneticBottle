@@ -86,7 +86,7 @@ def drawBlines(Po_x, Po_y, Po_z, linedist):
         bx, by, bz = calcBcoils(px, py, pz)
         normfact = linedist / sqrt(bx**2 + by**2 + bz**2)
         
-        print normfact
+        #print normfact
         
         bxn = bx * normfact
         byn = by * normfact
