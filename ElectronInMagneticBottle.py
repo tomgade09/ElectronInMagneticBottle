@@ -89,7 +89,7 @@ def drawBlines(Po_x, Po_y, Po_z, linedist):
     px = Po_x
     py = Po_y
     pz = Po_z
-    
+    ##need to remove to VPyDraw.py
     while px < 5:
         bx, by, bz = calcBcoils(px, py, pz)
         #normfact = linedist / sqrt(bx**2 + by**2 + bz**2)
