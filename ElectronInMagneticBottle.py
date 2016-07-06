@@ -91,7 +91,7 @@ def drawBlines(Po_x, Po_y, Po_z, linedist):
         byn = by * normfact
         bzn = bz * normfact
         
-        arrow(pos=(px, py, pz), axis=(bxn, byn, bzn), color=color.red, headwidth=0.001, 
+        arrow(pos=(px, py, pz), axis=(bxn, byn, bzn), color=color.red, headwidth=0.005, 
             headlength=0.001, shaftwidth=0.01)
             
         #arrow(pos=(px, py, pz), axis=(bx*10000, by*10000, bz*10000), color=color.cyan, 
@@ -101,19 +101,10 @@ def drawBlines(Po_x, Po_y, Po_z, linedist):
         py += byn
         pz += bzn
 
-def main():
-    ind = 0                            #Index (Calculation Counter)
-    t = 0                              #Initial time [s]
-    Vx = 100                           #Initial Electron Velocity [cm/s]
-    Vy = 100
-    Vz = 100
-    Px = -4.75                         #Initial Electron Position [cm]
-    Py = 0
-    Pz = 0
-    
+def drawwindow(wd, ht, centx, centy, centz, to):
     # Graphical Necessities
-    scene1 = display(title='Electron in Magnetic Bottle', autocenter=0, width=1920, 
-        height=1200, center=(Px,Py,Pz), exit=0, range = (15,15,15))
+    scene = display(title='Electron in Magnetic Bottle', autocenter=0, width=wd, 
+        height=ht, center=(centx,centy,centz), exit=0, range=(15,15,15))
     xaxpt=[0,1,2,3,4,5,6,7,8,9,10]
     yaxpt=[0,1,2,3,4,5,6,7,8,9,10]
     zaxpt=[0,1,2,3,4,5,6,7,8,9,10]
@@ -127,11 +118,30 @@ def main():
         points(pos=(0,yaxpt[i],0), size=5, color=color.cyan)
         points(pos=(0,0,zaxpt[i]), size=5, color=color.cyan)
 
-    electron=sphere(pos=(Px,Py,Pz), radius=0.0000001, color=color.green,
+    relativetime = label(pos=(-6.5, 0, 0), text='t = ' + str(to) + ' s')
+    
+    return scene, relativetime
+    
+def createElec(po_x, po_y, po_z):
+    electron = sphere(pos=(po_x,po_y,po_z), radius=0.0000001, color=color.green,
         make_trail=True, trail_type="points", interval=10, retain=100)
         
-    relTclock = label(pos=(-6.5, 0, 0), text='t = ' + str(t) + ' s')
+    return electron
+
+def main():
+    ind = 0                            #Index (Calculation Counter)
+    t = 0                              #Initial time [s]
+    Vx = 1000                          #Initial Electron Velocity [cm/s]
+    Vy = 1000
+    Vz = 1000
+    Px = -4.75                         #Initial Electron Position [cm]
+    Py = 0
+    Pz = 0
+
+    scene1, relTclock = drawwindow(1920, 1080, Px, Py, Pz, t)
     
+    electron1 = createElec(Px,Py,Pz)
+
     # Calculate B Field Lines from given points
     drawBlines(-5, 0, -3.5, 0.1)
     drawBlines(-5, -3.5, 0, 0.1)
@@ -145,7 +155,7 @@ def main():
         Px, Py, Pz = calcP(Px, Py, Pz, Vx, Vy, Vz)
         t += dt                  #time increase [s]
         ind += 1                 #index increase
-        electron.pos=(Px,Py,Pz)
+        electron1.pos=(Px,Py,Pz)
         relTclock.text = 't = ' + str(t) + ' s'
 
 if __name__ == "__main__":
