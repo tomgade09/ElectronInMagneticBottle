@@ -101,6 +101,7 @@ def drawBlines(Po_x, Po_y, Po_z, linedist):
         py += byn
         pz += bzn
 
+###VPython Graphics functions
 def drawwindow(wd, ht, centx, centy, centz, to):
     # Graphical Necessities
     scene = display(title='Electron in Magnetic Bottle', autocenter=0, width=wd, 
@@ -122,11 +123,16 @@ def drawwindow(wd, ht, centx, centy, centz, to):
     
     return scene, relativetime
     
-def createElec(po_x, po_y, po_z):
-    electron = sphere(pos=(po_x,po_y,po_z), radius=0.0000001, color=color.green,
+def drawparticle(po_x, po_y, po_z):
+    particle = sphere(pos=(po_x,po_y,po_z), radius=0.0000001, color=color.green,
         make_trail=True, trail_type="points", interval=10, retain=100)
         
-    return electron
+    return particle
+    
+def updatePic(partObj,relclock,px,py,pz,relt):
+    partObj.pos = (px,py,pz)
+    relclock.text = 't = ' + str(relt) + ' s'
+###End VPython
 
 def main():
     ind = 0                            #Index (Calculation Counter)
@@ -140,7 +146,7 @@ def main():
 
     scene1, relTclock = drawwindow(1920, 1080, Px, Py, Pz, t)
     
-    electron1 = createElec(Px,Py,Pz)
+    electron1 = drawparticle(Px,Py,Pz)
 
     # Calculate B Field Lines from given points
     drawBlines(-5, 0, -3.5, 0.1)
@@ -155,8 +161,7 @@ def main():
         Px, Py, Pz = calcP(Px, Py, Pz, Vx, Vy, Vz)
         t += dt                  #time increase [s]
         ind += 1                 #index increase
-        electron1.pos=(Px,Py,Pz)
-        relTclock.text = 't = ' + str(t) + ' s'
+        updatePic(electron1,relTclock,Px,Py,Pz,t)
 
 if __name__ == "__main__":
     main()
