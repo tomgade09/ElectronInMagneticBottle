@@ -6,8 +6,16 @@
 
 from __future__ import division
 from math import pi
-from visual import *
 from scipy import integrate
+
+import os, sys, inspect
+a = os.path.dirname(os.path.abspath(inspect.getsourcefile(lambda:0)))
+sys.path.append(a)
+
+# Only use one of these at a time to avoid namespace conflict
+from VPyDraw import *
+#from pygletDraw import *
+#from OpenGLDraw import *
 
 muo = float(4*pi*10**(-7))         #Permeability of Free Space [T*m/A]
 eom = 1.76*10**11                  #Charge to mass ratio [C/kg]
@@ -101,39 +109,6 @@ def drawBlines(Po_x, Po_y, Po_z, linedist):
         py += byn
         pz += bzn
 
-###VPython Graphics functions
-def drawwindow(wd, ht, centx, centy, centz, to):
-    # Graphical Necessities
-    scene = display(title='Electron in Magnetic Bottle', autocenter=0, width=wd, 
-        height=ht, center=(centx,centy,centz), exit=0, range=(15,15,15))
-    xaxpt=[0,1,2,3,4,5,6,7,8,9,10]
-    yaxpt=[0,1,2,3,4,5,6,7,8,9,10]
-    zaxpt=[0,1,2,3,4,5,6,7,8,9,10]
-    ring(pos=(-d,0,0), axis=(1,0,0), radius=R, thickness=0.01)
-    ring(pos=(d,0,0), axis=(1,0,0), radius=R, thickness=0.01)
-    xlbl = label(pos=(10,1,0), text='x')
-    ylbl =  label(pos=(1,10,0), text='y')
-    zlbl =  label(pos=(0,1,10), text='z')
-    for i in range(0,10,1):
-        points(pos=(xaxpt[i],0,0), size=5, color=color.cyan)
-        points(pos=(0,yaxpt[i],0), size=5, color=color.cyan)
-        points(pos=(0,0,zaxpt[i]), size=5, color=color.cyan)
-
-    relativetime = label(pos=(-6.5, 0, 0), text='t = ' + str(to) + ' s')
-    
-    return scene, relativetime
-    
-def drawparticle(po_x, po_y, po_z):
-    particle = sphere(pos=(po_x,po_y,po_z), radius=0.0000001, color=color.green,
-        make_trail=True, trail_type="points", interval=10, retain=100)
-        
-    return particle
-    
-def updatePic(partObj,relclock,px,py,pz,relt):
-    partObj.pos = (px,py,pz)
-    relclock.text = 't = ' + str(relt) + ' s'
-###End VPython
-
 def main():
     ind = 0                            #Index (Calculation Counter)
     t = 0                              #Initial time [s]
@@ -144,9 +119,9 @@ def main():
     Py = 0
     Pz = 0
 
-    scene1, relTclock = drawwindow(1920, 1080, Px, Py, Pz, t)
+    scene1, relTclock = drawWindow(1920, 1080, Px, Py, Pz, t, d, R)
     
-    electron1 = drawparticle(Px,Py,Pz)
+    electron1 = drawParticlePic(Px,Py,Pz)
 
     # Calculate B Field Lines from given points
     drawBlines(-5, 0, -3.5, 0.1)
@@ -161,7 +136,7 @@ def main():
         Px, Py, Pz = calcP(Px, Py, Pz, Vx, Vy, Vz)
         t += dt                  #time increase [s]
         ind += 1                 #index increase
-        updatePic(electron1,relTclock,Px,Py,Pz,t)
+        updateParticlePic(electron1,relTclock,Px,Py,Pz,t)
 
 if __name__ == "__main__":
     main()
