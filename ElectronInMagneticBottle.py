@@ -1,6 +1,6 @@
 # Tom Gade
 # Electron in a Magnetic Bottle
-# v3.1.0 03Jul16
+# v3.2.0 06Jul16
 # Works on Python 2.7 ONLY (as of now), and VPython 6
 # Written as part of a Senior research project at the Citadel, 2008-2009
 
