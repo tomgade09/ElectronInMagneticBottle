@@ -12,6 +12,8 @@ import os, sys, inspect
 a = os.path.dirname(os.path.abspath(inspect.getsourcefile(lambda:0)))
 sys.path.append(a)
 
+#from classes import *
+
 # Only use one of these at a time to avoid namespace conflict
 from VPyDraw import *
 #from pygletDraw import *
@@ -85,7 +87,7 @@ def calcP(px, py, pz, vx, vy, vz):
     
     return px, py, pz
 
-def drawBlines(Po_x, Po_y, Po_z, linedist):
+def drawBlines(windObj, Po_x, Po_y, Po_z, linedist):
     px = Po_x
     py = Po_y
     pz = Po_z
@@ -99,7 +101,7 @@ def drawBlines(Po_x, Po_y, Po_z, linedist):
         byn = by * normfact
         bzn = bz * normfact
         
-        drawLine(px, py, pz, bxn, byn, bzn)
+        drawLine(windObj, px, py, pz, bxn, byn, bzn)
         
         px += bxn
         py += byn
@@ -116,13 +118,14 @@ def main():
     Pz = 0
 
     # Draw some things
-    scene1, relTclock = drawWindow(1920, 1080, Px, Py, Pz, t, d, R)    
-    drawWireLoopPair(d, R)
-    electron1 = drawParticlePic(Px,Py,Pz,10,100)
-    drawBlines(-5, 0, -3.5, 0.1)
-    drawBlines(-5, -3.5, 0, 0.1)
-    drawBlines(-5, 0, 3.5, 0.1)
-    drawBlines(-5, 3.5, 0, 0.1)
+    windObj1 = drawWindow(1920, 1080, Px, Py, Pz, d, R)    
+    relclockObj1 = drawTimeClock(windObj1, t)
+    drawWireLoopPair(windObj1, d, R)
+    electron1 = drawParticlePic(windObj1, Px, Py, Pz, 10, 100)
+    drawBlines(windObj1, -5, 0, -3.5, 0.1)
+    drawBlines(windObj1, -5, -3.5, 0, 0.1)
+    drawBlines(windObj1, -5, 0, 3.5, 0.1)
+    drawBlines(windObj1, -5, 3.5, 0, 0.1)
         
     while t <= .001:
         FPSrate(10000)
@@ -131,7 +134,8 @@ def main():
         Px, Py, Pz = calcP(Px, Py, Pz, Vx, Vy, Vz)
         t += dt                  #time increase [s]
         ind += 1                 #index increase
-        updatePic(electron1,relTclock,Px,Py,Pz,t)
+        updateParticlePic(windObj1, electron1, Px, Py, Pz)
+        updateTimeClock(windObj1, relclockObj1, t)
 
 if __name__ == "__main__":
     main()
