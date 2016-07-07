@@ -29,7 +29,7 @@ def updatePic(partObj,relclockObj,px,py,pz,relt):
     partObj.pos = (px,py,pz)
     relclockObj.text = 't = ' + str(relt) + ' s'
     
-def drawLines(px, py, pz, axis_x, axis_y, axis_z):
+def drawLine(px, py, pz, axis_x, axis_y, axis_z):
     arrow(pos=(px, py, pz), axis=(axis_x, axis_y, axis_z), color=color.red,
         headwidth=0.005, headlength=0.001, shaftwidth=0.01)
         

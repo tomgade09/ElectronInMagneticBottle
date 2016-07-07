@@ -99,7 +99,7 @@ def drawBlines(Po_x, Po_y, Po_z, linedist):
         byn = by * normfact
         bzn = bz * normfact
         
-        drawLines(px, py, pz, bxn, byn, bzn)
+        drawLine(px, py, pz, bxn, byn, bzn)
         
         px += bxn
         py += byn
