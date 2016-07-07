@@ -1,3 +1,5 @@
+from __future__ import division
+
 from VPyDraw import *
 from scipy import integrate
 from math import pi
@@ -75,21 +77,20 @@ class WireCoilPair(object):
         self.R = R
         self.d = d
         self.wind = windObj
+        self.cst = float(self.N * self.I * 10**(-5))
 
     def initDraw(self):
         drawWireCoilPair(self.wind, self.d, self.R)
         
     def calcBatP(self, px, py, pz):
-        """Calculate the B field as a result of the wire coils at a position P."""
-        const = float(self.N * self.I * 10**(-5))
-    
+        """Calculate the B field as a result of the wire coils at a position P."""    
         #Equations to Integrate
-        lfdBx = lambda a: const*(-self.R*pz*sin(a) - self.R*py*cos(a) + self.R**2) / (((px + self.d)**2 + (py - self.R*cos(a))**2 + (pz - self.R*sin(a))**2)**(3/2))
-        rtdBx = lambda a: const*(-self.R*pz*sin(a) - self.R*py*cos(a) + self.R**2) / (((px - self.d)**2 + (py - self.R*cos(a))**2 + (pz - self.R*sin(a))**2)**(3/2))
-        lfdBy = lambda a: const*(self.R*cos(a)*(px + self.d)) / (((px + self.d)**2 + (py - self.R*cos(a))**2 + (pz - self.R*sin(a))**2)**(3/2))
-        rtdBy = lambda a: const*(self.R*cos(a)*(px - self.d)) / (((px - self.d)**2 + (py - self.R*cos(a))**2 + (pz - self.R*sin(a))**2)**(3/2))
-        lfdBz = lambda a: const*(self.R*sin(a)*(px + self.d)) / (((px + self.d)**2 + (py - self.R*cos(a))**2 + (pz - self.R*sin(a))**2)**(3/2))
-        rtdBz = lambda a: const*(self.R*sin(a)*(px - self.d)) / (((px - self.d)**2 + (py - self.R*cos(a))**2 + (pz-self.R*sin(a))**2)**(3/2))
+        lfdBx = lambda a: self.cst*(-self.R*pz*sin(a) - self.R*py*cos(a) + self.R**2) / (((px + self.d)**2 + (py - self.R*cos(a))**2 + (pz - self.R*sin(a))**2)**(3/2))
+        rtdBx = lambda a: self.cst*(-self.R*pz*sin(a) - self.R*py*cos(a) + self.R**2) / (((px - self.d)**2 + (py - self.R*cos(a))**2 + (pz - self.R*sin(a))**2)**(3/2))
+        lfdBy = lambda a: self.cst*(self.R*cos(a)*(px + self.d)) / (((px + self.d)**2 + (py - self.R*cos(a))**2 + (pz - self.R*sin(a))**2)**(3/2))
+        rtdBy = lambda a: self.cst*(self.R*cos(a)*(px - self.d)) / (((px - self.d)**2 + (py - self.R*cos(a))**2 + (pz - self.R*sin(a))**2)**(3/2))
+        lfdBz = lambda a: self.cst*(self.R*sin(a)*(px + self.d)) / (((px + self.d)**2 + (py - self.R*cos(a))**2 + (pz - self.R*sin(a))**2)**(3/2))
+        rtdBz = lambda a: self.cst*(self.R*sin(a)*(px - self.d)) / (((px - self.d)**2 + (py - self.R*cos(a))**2 + (pz - self.R*sin(a))**2)**(3/2))
     
         # Integrate Functions Iteratively
         lfBx = integrate.quad(lfdBx, 0, 2*pi)
