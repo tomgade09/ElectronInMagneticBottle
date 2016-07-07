@@ -5,7 +5,6 @@
 # Written as part of a Senior research project at the Citadel, 2008-2009
 
 from __future__ import division
-from math import pi
 
 import os, sys, inspect
 a = os.path.dirname(os.path.abspath(inspect.getsourcefile(lambda:0)))
@@ -49,7 +48,8 @@ def main():
     
     while t <= .001:
         FPSrate(10000)
-        Bx, By, Bz = B.totalBatP(electron1.px, electron1.py, electron1.pz)
+        #Bx, By, Bz = B.totalBatP(electron1.px, electron1.py, electron1.pz)
+        Bx, By, Bz = wireCoils.calcBatP(electron1.px, electron1.py, electron1.pz)
         
         electron1.updP(Bx, By, Bz, dt)
 
