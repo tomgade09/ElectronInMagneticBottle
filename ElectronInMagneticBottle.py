@@ -89,7 +89,7 @@ def drawBlines(Po_x, Po_y, Po_z, linedist):
     px = Po_x
     py = Po_y
     pz = Po_z
-    ##need to remove to VPyDraw.py
+    
     while px < 5:
         bx, by, bz = calcBcoils(px, py, pz)
         #normfact = linedist / sqrt(bx**2 + by**2 + bz**2)
@@ -99,11 +99,7 @@ def drawBlines(Po_x, Po_y, Po_z, linedist):
         byn = by * normfact
         bzn = bz * normfact
         
-        arrow(pos=(px, py, pz), axis=(bxn, byn, bzn), color=color.red, headwidth=0.005, 
-            headlength=0.001, shaftwidth=0.01)
-            
-        #arrow(pos=(px, py, pz), axis=(bx*10000, by*10000, bz*10000), color=color.cyan, 
-        #    headwidth=0.001, headlength=0.001, shaftwidth=0.01)
+        drawLines(px, py, pz, bxn, byn, bzn)
         
         px += bxn
         py += byn
@@ -119,24 +115,23 @@ def main():
     Py = 0
     Pz = 0
 
-    scene1, relTclock = drawWindow(1920, 1080, Px, Py, Pz, t, d, R)
-    
-    electron1 = drawParticlePic(Px,Py,Pz)
-
-    # Calculate B Field Lines from given points
+    # Draw some things
+    scene1, relTclock = drawWindow(1920, 1080, Px, Py, Pz, t, d, R)    
+    drawWireLoopPair(d, R)
+    electron1 = drawParticlePic(Px,Py,Pz,10,100)
     drawBlines(-5, 0, -3.5, 0.1)
     drawBlines(-5, -3.5, 0, 0.1)
     drawBlines(-5, 0, 3.5, 0.1)
     drawBlines(-5, 3.5, 0, 0.1)
         
     while t <= .001:
-        rate(10000)
+        FPSrate(10000)
         Bx, By, Bz = calcBcoils(Px, Py, Pz)
         Vx, Vy, Vz = calcV(Bx, By, Bz, Vx, Vy, Vz)
         Px, Py, Pz = calcP(Px, Py, Pz, Vx, Vy, Vz)
         t += dt                  #time increase [s]
         ind += 1                 #index increase
-        updateParticlePic(electron1,relTclock,Px,Py,Pz,t)
+        updatePic(electron1,relTclock,Px,Py,Pz,t)
 
 if __name__ == "__main__":
     main()
