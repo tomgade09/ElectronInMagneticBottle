@@ -39,28 +39,12 @@ def main():
     B.drawBlines(windObj1, -5, 0, 3.5, 0.1)
     B.drawBlines(windObj1, -5, 3.5, 0, 0.1)
     
-    print "First"
-    print "P:"
-    print electron1.px, electron1.py, electron1.pz
-    print "V:"
-    print electron1.vx, electron1.vy, electron1.vz
-    print "=================="
-    
     while t <= .001:
         FPSrate(10000)
         #Bx, By, Bz = B.totalBatP(electron1.px, electron1.py, electron1.pz)
         Bx, By, Bz = wireCoils.calcBatP(electron1.px, electron1.py, electron1.pz)
         
         electron1.updP(Bx, By, Bz, dt)
-
-        print ind
-        print "B:"
-        print Bx, By, Bz        
-        print "P:"
-        print electron1.px, electron1.py, electron1.pz
-        print "V:"
-        print electron1.vx, electron1.vy, electron1.vz
-        print "=================="
         
         t += dt                  #time increase [s]
         ind += 1                 #index increase
