@@ -1,6 +1,6 @@
 from visual import *
 
-def drawWindow(wd, ht, centx, centy, centz, d, R):
+def drawWindow(wd, ht, centx, centy, centz):
     # Call this first to create a window that other draw functions will draw to.
     windObj = display(title='Electron in Magnetic Bottle', autocenter=0, width=wd, 
         height=ht, center=(centx,centy,centz), exit=0, range=(15,15,15))
@@ -21,6 +21,7 @@ def drawParticlePic(windObj, po_x, po_y, po_z, intrvl, traillng):
     windObj.select()
     particle = sphere(pos=(po_x,po_y,po_z), radius=0.0000001, color=color.green,
         make_trail=True, trail_type="points", interval=intrvl, retain=traillng)
+    #particle.trail_object.color = color.yellow
         
     return particle
     
@@ -43,7 +44,7 @@ def drawLine(windObj, px, py, pz, axis_x, axis_y, axis_z):
     arrow(pos=(px, py, pz), axis=(axis_x, axis_y, axis_z), color=color.red,
         headwidth=0.005, headlength=0.001, shaftwidth=0.01)
         
-def drawWireLoopPair(windObj, d, R):
+def drawWireCoilPair(windObj, d, R):
     windObj.select()
     ring(pos=(-d,0,0), axis=(1,0,0), radius=R, thickness=0.01)
     ring(pos=(d,0,0), axis=(1,0,0), radius=R, thickness=0.01)
