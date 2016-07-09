@@ -13,16 +13,16 @@ class Particle(object):
     - Position Vector (x,y,z)
     - Velocity Vector (vx,vy,vz)"""
     
-    def __init__(self, windObj, charge, mass, po_x, po_y, po_z, vo_x, vo_y, vo_z):
+    def __init__(self, windObj, charge, mass, po, vo):
         """Initiate a particle object."""
         self.charge = charge
         self.mass = mass
-        self.px = po_x
-        self.py = po_y
-        self.pz = po_z
-        self.vx = vo_x
-        self.vy = vo_y
-        self.vz = vo_z
+        self.px = po[0]
+        self.py = po[1]
+        self.pz = po[2]
+        self.vx = vo[0]
+        self.vy = vo[1]
+        self.vz = vo[2]
         self.eom = self.charge / self.mass
         self.pic = None
         self.wind = windObj
@@ -31,7 +31,7 @@ class Particle(object):
         if self.pic != None:
             print "Pic has already been initialized.  Use updDraw to change the position."
             return
-        self.pic = drawParticlePic(self.wind, self.px, self.py, self.pz, intrvl, traillng)
+        self.pic = drawParticlePic(self.wind, (self.px, self.py, self.pz), intrvl, traillng)
         
         return self.pic
         
@@ -39,7 +39,7 @@ class Particle(object):
         if self.pic == None:
             print "Pic has not been initialized.  Use initDraw to create a picture of the particle first."
             return
-        updateParticlePic(self.wind, self.pic, self.px, self.py, self.pz)
+        updateParticlePic(self.wind, self.pic, (self.px, self.py, self.pz))
     
     def __updV(self, bx, by, bz, dt):
         """Calculate the new velocity of the particle based on the specified B field."""
@@ -71,7 +71,15 @@ class WireCoilPair(object):
     
     Note: This builds a pair of coils, parallel to one another, offset from the origin by a distance d.  There is no way to build a single wire loop, or to have the loops offset from one another.  Hence the name 'Wire Coil Pair'"""
     
-    def __init__(self, windObj, N, I, R, d):
+    def __init__(self, windObj, C, axis, N, I, R, d):
+        self.Cx = C[0]
+        self.Cy = C[1]
+        self.Cz = C[2]
+        self.axis_x = axis[0]
+        self.axis_y = axis[1]
+        self.axis_z = axis[2]
+        #self.axis_theta = 
+        #self.axis_phi = 
         self.N = N
         self.I = I
         self.R = R
@@ -82,15 +90,15 @@ class WireCoilPair(object):
     def initDraw(self):
         drawWireCoilPair(self.wind, self.d, self.R)
         
-    def calcBatP(self, px, py, pz):
+    def calcBatP(self, p):
         """Calculate the B field as a result of the wire coils at a position P."""    
         #Equations to Integrate
-        lfdBx = lambda a: self.cst*(-self.R*pz*sin(a) - self.R*py*cos(a) + self.R**2) / (((px + self.d)**2 + (py - self.R*cos(a))**2 + (pz - self.R*sin(a))**2)**(3/2))
-        rtdBx = lambda a: self.cst*(-self.R*pz*sin(a) - self.R*py*cos(a) + self.R**2) / (((px - self.d)**2 + (py - self.R*cos(a))**2 + (pz - self.R*sin(a))**2)**(3/2))
-        lfdBy = lambda a: self.cst*(self.R*cos(a)*(px + self.d)) / (((px + self.d)**2 + (py - self.R*cos(a))**2 + (pz - self.R*sin(a))**2)**(3/2))
-        rtdBy = lambda a: self.cst*(self.R*cos(a)*(px - self.d)) / (((px - self.d)**2 + (py - self.R*cos(a))**2 + (pz - self.R*sin(a))**2)**(3/2))
-        lfdBz = lambda a: self.cst*(self.R*sin(a)*(px + self.d)) / (((px + self.d)**2 + (py - self.R*cos(a))**2 + (pz - self.R*sin(a))**2)**(3/2))
-        rtdBz = lambda a: self.cst*(self.R*sin(a)*(px - self.d)) / (((px - self.d)**2 + (py - self.R*cos(a))**2 + (pz - self.R*sin(a))**2)**(3/2))
+        lfdBx = lambda a: self.cst*(-self.R*p[2]*sin(a) - self.R*p[1]*cos(a) + self.R**2) / (((p[0] + self.d)**2 + (p[1] - self.R*cos(a))**2 + (p[2] - self.R*sin(a))**2)**(3/2))
+        rtdBx = lambda a: self.cst*(-self.R*p[2]*sin(a) - self.R*p[1]*cos(a) + self.R**2) / (((p[0] - self.d)**2 + (p[1] - self.R*cos(a))**2 + (p[2] - self.R*sin(a))**2)**(3/2))
+        lfdBy = lambda a: self.cst*(self.R*cos(a)*(p[0] + self.d)) / (((p[0] + self.d)**2 + (p[1] - self.R*cos(a))**2 + (p[2] - self.R*sin(a))**2)**(3/2))
+        rtdBy = lambda a: self.cst*(self.R*cos(a)*(p[0] - self.d)) / (((p[0] - self.d)**2 + (p[1] - self.R*cos(a))**2 + (p[2] - self.R*sin(a))**2)**(3/2))
+        lfdBz = lambda a: self.cst*(self.R*sin(a)*(p[0] + self.d)) / (((p[0] + self.d)**2 + (p[1] - self.R*cos(a))**2 + (p[2] - self.R*sin(a))**2)**(3/2))
+        rtdBz = lambda a: self.cst*(self.R*sin(a)*(p[0] - self.d)) / (((p[0] - self.d)**2 + (p[1] - self.R*cos(a))**2 + (p[2] - self.R*sin(a))**2)**(3/2))
     
         # Integrate Functions Iteratively
         lfBx = integrate.quad(lfdBx, 0, 2*pi)
@@ -114,25 +122,25 @@ class BField(object):
         self.BObjList = BObjList
         self.windObj = windObj
         
-    def totalBatP(self, px, py, pz):
+    def totalBatP(self, p):
         Bx = 0
         By = 0
         Bz = 0
         for BObj in self.BObjList:
-            bx, by, bz = BObj.calcBatP(px, py, pz)
+            bx, by, bz = BObj.calcBatP((p[0], p[1], p[2]))
             Bx += bx
             By += by
             Bz += bz
         
         return Bx, By, Bz
     
-    def drawBlines(self, windObj, Po_x, Po_y, Po_z, linedist):
-        px = Po_x
-        py = Po_y
-        pz = Po_z
+    def drawBlines(self, windObj, Po, linedist):
+        px = Po[0]
+        py = Po[1]
+        pz = Po[2]
     
         while px < 5:
-            bx, by, bz = self.totalBatP(px, py, pz)
+            bx, by, bz = self.totalBatP((px, py, pz))
             #normfact = linedist / sqrt(bx**2 + by**2 + bz**2)
             normfact = 10000
         
@@ -140,7 +148,7 @@ class BField(object):
             byn = by * normfact
             bzn = bz * normfact
         
-            drawLine(windObj, px, py, pz, bxn, byn, bzn)
+            drawLine(windObj, (px, py, pz), (bxn, byn, bzn))
         
             px += bxn
             py += byn
