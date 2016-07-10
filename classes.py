@@ -2,7 +2,7 @@ from __future__ import division
 
 from VPyDraw import *
 from scipy import integrate
-from math import pi
+from math import *
 
 class Particle(object):
     """Define a particle to be placed in the specified magnetic field.
@@ -78,27 +78,56 @@ class WireCoilPair(object):
         self.axis_x = axis[0]
         self.axis_y = axis[1]
         self.axis_z = axis[2]
-        #self.axis_theta = 
-        #self.axis_phi = 
         self.N = N
         self.I = I
         self.R = R
         self.d = d
         self.wind = windObj
         self.cst = float(self.N * self.I * 10**(-5))
+        
+        if self.axis_x != 0 and self.axis_y == 100 and self.axis_z == 0:
+            self.axiscf_theta = self.axiscf_phi = 0
+        else:
+            self.axis_rho, self.axis_theta, self.axis_phi = cartesianToSpherical(
+                self.axis_x, self.axis_y, self.axis_z)
+        
+            self.axiscf_theta = (pi / 2) - self.axis_theta
+            self.axiscf_phi = -self.axis_phi
 
     def initDraw(self):
-        drawWireCoilPair(self.wind, self.d, self.R)
+        cntrt = sphericalToCartesian(self.d, self.axis_theta, self.axis_phi)
+        if self.axis_phi > pi:
+            cntlf = sphericalToCartesian(self.d, pi - self.axis_theta, self.axis_phi - pi)
+        else:
+            cntlf = sphericalToCartesian(self.d, pi - self.axis_theta, self.axis_phi + pi)
+        cntrt = (cntrt[0] + self.Cx, cntrt[1] + self.Cy, cntrt[2] + self.Cz)
+        cntlf = (cntlf[0] + self.Cx, cntlf[1] + self.Cy, cntlf[2] + self.Cz)
+        drawWireCoilPair(self.wind, (self.Cx, self.Cy, self.Cz), 
+            (self.axis_x, self.axis_y, self.axis_z), cntlf, cntrt, self.R)
         
     def calcBatP(self, p):
-        """Calculate the B field as a result of the wire coils at a position P."""    
+        """Calculate the B field as a result of the wire coils at a position P."""
+        ppr = (p[0] - self.Cx, p[1] - self.Cy, p[2] - self.Cz)
+        
         #Equations to Integrate
-        lfdBx = lambda a: self.cst*(-self.R*p[2]*sin(a) - self.R*p[1]*cos(a) + self.R**2) / (((p[0] + self.d)**2 + (p[1] - self.R*cos(a))**2 + (p[2] - self.R*sin(a))**2)**(3/2))
-        rtdBx = lambda a: self.cst*(-self.R*p[2]*sin(a) - self.R*p[1]*cos(a) + self.R**2) / (((p[0] - self.d)**2 + (p[1] - self.R*cos(a))**2 + (p[2] - self.R*sin(a))**2)**(3/2))
-        lfdBy = lambda a: self.cst*(self.R*cos(a)*(p[0] + self.d)) / (((p[0] + self.d)**2 + (p[1] - self.R*cos(a))**2 + (p[2] - self.R*sin(a))**2)**(3/2))
-        rtdBy = lambda a: self.cst*(self.R*cos(a)*(p[0] - self.d)) / (((p[0] - self.d)**2 + (p[1] - self.R*cos(a))**2 + (p[2] - self.R*sin(a))**2)**(3/2))
-        lfdBz = lambda a: self.cst*(self.R*sin(a)*(p[0] + self.d)) / (((p[0] + self.d)**2 + (p[1] - self.R*cos(a))**2 + (p[2] - self.R*sin(a))**2)**(3/2))
-        rtdBz = lambda a: self.cst*(self.R*sin(a)*(p[0] - self.d)) / (((p[0] - self.d)**2 + (p[1] - self.R*cos(a))**2 + (p[2] - self.R*sin(a))**2)**(3/2))
+        lfdBx = lambda a: self.cst*(-self.R*ppr[2]*sin(a) - self.R*ppr[1]*cos(a) + 
+            self.R**2) / (((ppr[0] + self.d)**2 + (ppr[1] - self.R*cos(a))**2 + (ppr[2] - 
+            self.R*sin(a))**2)**(3/2))
+        rtdBx = lambda a: self.cst*(-self.R*ppr[2]*sin(a) - self.R*ppr[1]*cos(a) + 
+            self.R**2) / (((ppr[0] - self.d)**2 + (ppr[1] - self.R*cos(a))**2 + (ppr[2] - 
+            self.R*sin(a))**2)**(3/2))
+        lfdBy = lambda a: self.cst*(self.R*cos(a)*(ppr[0] + self.d)) / (((ppr[0] + 
+            self.d)**2 + (ppr[1] - self.R*cos(a))**2 + (ppr[2] -
+            self.R*sin(a))**2)**(3/2))
+        rtdBy = lambda a: self.cst*(self.R*cos(a)*(ppr[0] - self.d)) / (((ppr[0] - 
+            self.d)**2 + (ppr[1] - self.R*cos(a))**2 + (ppr[2] -
+            self.R*sin(a))**2)**(3/2))
+        lfdBz = lambda a: self.cst*(self.R*sin(a)*(ppr[0] + self.d)) / (((ppr[0] +
+            self.d)**2 + (ppr[1] - self.R*cos(a))**2 + (ppr[2] -
+            self.R*sin(a))**2)**(3/2))
+        rtdBz = lambda a: self.cst*(self.R*sin(a)*(ppr[0] - self.d)) / (((ppr[0] -
+            self.d)**2 + (ppr[1] - self.R*cos(a))**2 + (ppr[2] -
+            self.R*sin(a))**2)**(3/2))
     
         # Integrate Functions Iteratively
         lfBx = integrate.quad(lfdBx, 0, 2*pi)
@@ -112,9 +141,17 @@ class WireCoilPair(object):
         bx = lfBx[0] + rtBx[0]
         by = lfBy[0] + rtBy[0]
         bz = lfBz[0] + rtBz[0]
-    
-        return bx, by, bz
         
+        #if self.axiscf_theta == 0 and self.axiscf_phi == 0:
+            #return bx, by, bz
+        
+        brho, btheta, bphi = cartesianToSpherical(bx, by, bz)
+        
+        bxprime, byprime, bzprime = sphericalToCartesian(
+            brho, btheta - self.axiscf_theta, bphi - self.axiscf_phi)
+        
+        return bxprime, byprime, bzprime
+
 class BField(object):
     """Calculate a number of B Field related things based on all B field producing elements."""
     
@@ -153,3 +190,17 @@ class BField(object):
             px += bxn
             py += byn
             pz += bzn
+
+def cartesianToSpherical(x, y, z):
+    rho = sqrt(x**2 + y**2 + z**2)
+    theta = acos(z / rho)
+    phi = atan2(y, x)
+        
+    return rho, theta, phi
+
+def sphericalToCartesian(rho, theta, phi):
+    x = rho * sin(theta) * cos(phi)
+    y = rho * sin(theta) * sin(phi)
+    z = rho * cos(theta)
+    
+    return x, y, z

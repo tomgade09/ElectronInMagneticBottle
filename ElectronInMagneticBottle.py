@@ -21,34 +21,44 @@ def main():
     t = 0                              #Initial time [s]
     BList = []
     dt = 5*10**-9
-
+    
+    e1center = (-4.75, 0, 0)
+    e1vel = (1000, 1000, 1000)
+    
     # Draw some things
-    windObj1 = drawWindow(1920, 1080, (-4.75, 0, 0))
+    windObj1 = drawWindow(1920, 1080, e1center)
     relclockObj1 = drawTimeClock(windObj1, t)
     
     wireCoils = WireCoilPair(windObj1, (0, 0, 0), (1, 0, 0), 1, 1, 5, 5)
     wireCoils.initDraw()
     BList.append(wireCoils)
     
-    electron1 = Particle(windObj1, -1.76*10**11, 1, (-4.75, 0, 0), (1000, 1000, 1000))
+    electron1 = Particle(windObj1, -1.76*10**11, 1, e1center, e1vel)
     electron1.initDraw(10, 50)
     
+    #electron2 = Particle(windObj1, -1.76*10**11, 1, (4.75, 0, 0), (-1000, -1000, -1000))
+    #electron2.initDraw(10, 50)
+    #electron2.color=color.yellow
+    
     B = BField(windObj1, BList)
-    B.drawBlines(windObj1, (-5, 0, -3.5), 0.1)
-    B.drawBlines(windObj1, (-5, -3.5, 0), 0.1)
-    B.drawBlines(windObj1, (-5, 0, 3.5), 0.1)
-    B.drawBlines(windObj1, (-5, 3.5, 0), 0.1)
+    #B.drawBlines(windObj1, (-5, 0, -3.5), 0.1)
+    #B.drawBlines(windObj1, (-5, -3.5, 0), 0.1)
+    #B.drawBlines(windObj1, (-5, 0, 3.5), 0.1)
+    #B.drawBlines(windObj1, (-5, 3.5, 0), 0.1)
     
     while t <= .001:
         FPSrate(10000)
         #Bx, By, Bz = B.totalBatP(electron1.px, electron1.py, electron1.pz)
         Bx, By, Bz = wireCoils.calcBatP((electron1.px, electron1.py, electron1.pz))
+        #Bxs, Bys, Bzs = wireCoils.calcBatP((electron2.px, electron2.py, electron2.pz))
         
         electron1.updP(Bx, By, Bz, dt)
+        #electron2.updP(Bxs, Bys, Bzs, dt)
         
         t += dt                  #time increase [s]
         ind += 1                 #index increase
         electron1.updDraw()
+        #electron2.updDraw()
         updateTimeClock(windObj1, relclockObj1, t)
 
 if __name__ == "__main__":

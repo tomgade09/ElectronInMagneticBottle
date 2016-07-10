@@ -53,10 +53,10 @@ def drawLine(windObj, p, laxis):
     arrow(pos=(px, py, pz), axis=(axis_x, axis_y, axis_z), color=color.red,
         headwidth=0.005, headlength=0.001, shaftwidth=0.01)
         
-def drawWireCoilPair(windObj, d, R):
+def drawWireCoilPair(windObj, C, norm, cntlf, cntrt, R):
     windObj.select()
-    ring(pos=(-d,0,0), axis=(1,0,0), radius=R, thickness=0.01)
-    ring(pos=(d,0,0), axis=(1,0,0), radius=R, thickness=0.01)
+    ring(pos=cntlf, axis=norm, radius=R, thickness=0.01)
+    ring(pos=cntrt, axis=norm, radius=R, thickness=0.01)
     
 def FPSrate(fps):
     rate(fps)
