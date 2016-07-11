@@ -195,7 +195,7 @@ def cartesianToSpherical(x, y, z):
     rho = sqrt(x**2 + y**2 + z**2)
     theta = acos(z / rho)
     phi = atan2(y, x)
-        
+    
     return rho, theta, phi
 
 def sphericalToCartesian(rho, theta, phi):
