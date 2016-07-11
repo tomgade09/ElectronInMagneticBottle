@@ -41,6 +41,8 @@ class Particle(object):
             return
         updateParticlePic(self.wind, self.pic, (self.px, self.py, self.pz))
     
+    #def calcBatP(self, p)
+    
     def __updV(self, bx, by, bz, dt):
         """Calculate the new velocity of the particle based on the specified B field."""
         vXB_x = self.vy * bz - self.vz * by
