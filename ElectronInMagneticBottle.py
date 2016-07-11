@@ -1,6 +1,6 @@
 # Tom Gade
 # Electron in a Magnetic Bottle
-# v4.1.0 09Jul16
+# v4.1.1 11Jul16
 # Works on Python 2.7 ONLY (as of now), and VPython 6
 # Written as part of a Senior research project at the Citadel, 2008-2009
 
@@ -11,7 +11,7 @@ a = os.path.dirname(os.path.abspath(inspect.getsourcefile(lambda:0)))
 sys.path.append(a)
 
 from classes import *
-# Only use one of these at a time to avoid namespace conflict
+# Only use one of these at a time to avoid namespace conflicts
 from VPyDraw import *
 #from pygletDraw import *
 #from OpenGLDraw import *
@@ -22,14 +22,14 @@ def main():
     BList = []
     dt = 5*10**-9
     
-    e1center = (-4.75, 0, 0)
-    e1vel = (1000, 1000, 1000)
+    e1center = (0, 0, -4.75)
+    e1vel = (-1000, 1000, 1000)
     
     # Draw some things
     windObj1 = drawWindow(1920, 1080, e1center)
     relclockObj1 = drawTimeClock(windObj1, t)
     
-    wireCoils = WireCoilPair(windObj1, (0, 0, 0), (1, 0, 0), 1, 1, 5, 5)
+    wireCoils = WireCoilPair(windObj1, (0, 0, 0), (0, 0, 1), 1, 1, 5, 5)
     wireCoils.initDraw()
     BList.append(wireCoils)
     
@@ -46,7 +46,8 @@ def main():
     #B.drawBlines(windObj1, (-5, 0, 3.5), 0.1)
     #B.drawBlines(windObj1, (-5, 3.5, 0), 0.1)
     
-    while t <= .001:
+    #while (-10 <= x <= 10) and (-10 <= y <= 10) and (-10 <= z <= 10):
+    while t < 0.001:
         FPSrate(10000)
         #Bx, By, Bz = B.totalBatP(electron1.px, electron1.py, electron1.pz)
         Bx, By, Bz = wireCoils.calcBatP((electron1.px, electron1.py, electron1.pz))
@@ -54,7 +55,6 @@ def main():
         
         electron1.updP(Bx, By, Bz, dt)
         #electron2.updP(Bxs, Bys, Bzs, dt)
-        
         t += dt                  #time increase [s]
         ind += 1                 #index increase
         electron1.updDraw()

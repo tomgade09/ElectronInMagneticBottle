@@ -78,9 +78,14 @@ class WireCoilPair(object):
         self.wind = windObj
         self.cst = float(self.N * self.I * 10**(-5))
         
-        #Change below line to use again
-        if self.axis_x != 0 and self.axis_y == 100 and self.axis_z == 0:
-            self.axiscf_theta = self.axiscf_phi = 0
+        if self.axis_x != 0 and self.axis_y == 0 and self.axis_z == 0:
+            #X axis - don't run code that's not necessary
+            self.axiscf_theta = self.axiscf_phi = self.axis_phi = 0
+            self.axis_theta = pi / 2
+        elif self.axis_x == 0 and self.axis_y == 0 and self.axis_z != 0:
+            #Z axis - causes problems in spherical coordinate system
+            self.axiscf_theta = - pi / 2; self.axiscf_phi = 0
+            self.axis_theta = self.axis_phi = 0
         else:
             self.axis_rho, self.axis_theta, self.axis_phi = cartesianToSpherical(
                 self.axis_x, self.axis_y, self.axis_z)
@@ -88,19 +93,24 @@ class WireCoilPair(object):
             self.axiscf_phi = self.axis_phi
 
     def initDraw(self):
-        cntrt = sphericalToCartesian(self.d, self.axis_theta, self.axis_phi)
-        if self.axis_phi > pi:
-            cntlf = sphericalToCartesian(self.d, pi - self.axis_theta, self.axis_phi - pi)
+        if self.axis_theta == 0 and self.axis_phi == 0:
+            cntrt = (self.Cx, self.Cy, self.Cz + self.d)
+            cntlf = (self.Cx, self.Cy, self.Cz - self.d)
         else:
-            cntlf = sphericalToCartesian(self.d, pi - self.axis_theta, self.axis_phi + pi)
-        cntrt = (cntrt[0] + self.Cx, cntrt[1] + self.Cy, cntrt[2] + self.Cz)
-        cntlf = (cntlf[0] + self.Cx, cntlf[1] + self.Cy, cntlf[2] + self.Cz)
+            cntrt = sphericalToCartesian(self.d, self.axis_theta, self.axis_phi)
+            if self.axis_phi > pi:
+                cntlf = sphericalToCartesian(self.d, pi-self.axis_theta, self.axis_phi-pi)
+            else:
+                cntlf = sphericalToCartesian(self.d, pi-self.axis_theta, self.axis_phi+pi)
+            cntrt = (cntrt[0] + self.Cx, cntrt[1] + self.Cy, cntrt[2] + self.Cz)
+            cntlf = (cntlf[0] + self.Cx, cntlf[1] + self.Cy, cntlf[2] + self.Cz)
         drawWireCoilPair(self.wind, (self.Cx, self.Cy, self.Cz), 
             (self.axis_x, self.axis_y, self.axis_z), cntlf, cntrt, self.R)
         
     def calcBatP(self, p):
         """Calculate the B field as a result of the wire coils at a position P."""
-        ppr = (p[0] - self.Cx, p[1] - self.Cy, p[2] - self.Cz)
+        ppr = rotateVector(p[0] - self.Cx, p[1] - self.Cy, p[2] - self.Cz,
+            -self.axiscf_theta, -self.axiscf_phi)
         
         #Equations to Integrate
         lfdBx = lambda a: self.cst*(-self.R*ppr[2]*sin(a) - self.R*ppr[1]*cos(a) + 
@@ -202,9 +212,10 @@ def sphericalToCartesian(rho, theta, phi):
     
 def rotateVector(x, y, z, rot_theta, rot_phi):
     if rot_theta == -pi / 2:
-        print True
         xprm = - z; yprm = y; zprm = x
         return xprm, yprm, zprm
+    elif rot_theta == rot_phi == 0:
+        return x, y, z
     
     tmp_rho, tmp_theta, tmp_phi = cartesianToSpherical(x, y, z)
     xprm, yprm, zprm = sphericalToCartesian(tmp_rho, tmp_theta + rot_theta, tmp_phi +
