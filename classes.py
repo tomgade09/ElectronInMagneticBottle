@@ -72,27 +72,20 @@ class WireCoilPair(object):
     Note: This builds a pair of coils, parallel to one another, offset from the origin by a distance d.  There is no way to build a single wire loop, or to have the loops offset from one another.  Hence the name 'Wire Coil Pair'"""
     
     def __init__(self, windObj, C, axis, N, I, R, d):
-        self.Cx = C[0]
-        self.Cy = C[1]
-        self.Cz = C[2]
-        self.axis_x = axis[0]
-        self.axis_y = axis[1]
-        self.axis_z = axis[2]
-        self.N = N
-        self.I = I
-        self.R = R
-        self.d = d
+        self.Cx = C[0]; self.Cy = C[1]; self.Cz = C[2]
+        self.axis_x = axis[0]; self.axis_y = axis[1]; self.axis_z = axis[2]
+        self.N = N; self.I = I; self.R = R; self.d = d
         self.wind = windObj
         self.cst = float(self.N * self.I * 10**(-5))
         
+        #Change below line to use again
         if self.axis_x != 0 and self.axis_y == 100 and self.axis_z == 0:
             self.axiscf_theta = self.axiscf_phi = 0
         else:
             self.axis_rho, self.axis_theta, self.axis_phi = cartesianToSpherical(
                 self.axis_x, self.axis_y, self.axis_z)
-        
-            self.axiscf_theta = (pi / 2) - self.axis_theta
-            self.axiscf_phi = -self.axis_phi
+            self.axiscf_theta = self.axis_theta - (pi / 2)
+            self.axiscf_phi = self.axis_phi
 
     def initDraw(self):
         cntrt = sphericalToCartesian(self.d, self.axis_theta, self.axis_phi)
@@ -144,11 +137,9 @@ class WireCoilPair(object):
         
         #if self.axiscf_theta == 0 and self.axiscf_phi == 0:
             #return bx, by, bz
-        
-        brho, btheta, bphi = cartesianToSpherical(bx, by, bz)
-        
-        bxprime, byprime, bzprime = sphericalToCartesian(
-            brho, btheta - self.axiscf_theta, bphi - self.axiscf_phi)
+            
+        bxprime, byprime, bzprime = rotateVector(bx, by, bz, self.axiscf_theta, 
+            self.axiscf_phi)
         
         return bxprime, byprime, bzprime
 
@@ -199,8 +190,24 @@ def cartesianToSpherical(x, y, z):
     return rho, theta, phi
 
 def sphericalToCartesian(rho, theta, phi):
-    x = rho * sin(theta) * cos(phi)
-    y = rho * sin(theta) * sin(phi)
-    z = rho * cos(theta)
+    if theta == 0:
+        x = y = 0
+        z = rho
+    else:
+        x = rho * sin(theta) * cos(phi)
+        y = rho * sin(theta) * sin(phi)
+        z = rho * cos(theta)
     
     return x, y, z
+    
+def rotateVector(x, y, z, rot_theta, rot_phi):
+    if rot_theta == -pi / 2:
+        print True
+        xprm = - z; yprm = y; zprm = x
+        return xprm, yprm, zprm
+    
+    tmp_rho, tmp_theta, tmp_phi = cartesianToSpherical(x, y, z)
+    xprm, yprm, zprm = sphericalToCartesian(tmp_rho, tmp_theta + rot_theta, tmp_phi +
+        rot_phi)
+    
+    return xprm, yprm, zprm
