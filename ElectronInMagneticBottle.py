@@ -9,6 +9,7 @@ from __future__ import division
 import os, sys, inspect
 a = os.path.dirname(os.path.abspath(inspect.getsourcefile(lambda:0)))
 sys.path.append(a)
+sys.path.append(a + '/vis/')
 
 from classes import *
 # Only use one of these at a time to avoid namespace conflicts
