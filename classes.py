@@ -9,10 +9,10 @@ class Particle(object):
     """Define a particle to be placed in the specified magnetic field.
     
     Attributes of the particle:
-    - Charge (q)
-    - Mass
-    - Position Vector [px,py,pz]
-    - Velocity Vector [vx,vy,vz]
+    - Charge (q) [C]
+    - Mass [kg]
+    - Position Vector [px,py,pz] [cm]
+    - Velocity Vector [vx,vy,vz] [m/s]
     
     Objects associated with the particle:
     - wind - The window object where the particle is being drawn
@@ -45,12 +45,13 @@ class Particle(object):
         updateParticlePic(self.wind, self.pic, self.p)
     
     def calcBatP(self, pB):
+        #Needs some work
         for i in range(len(pB)):
             pB[i] -= self.p[i]
         if abs(pB[0]) <= 10e-15 and abs(pB[1]) <= 10e-15 and abs(pB[2]) <=10e-15:
             return 0, 0, 0
         plen = sqrt(pB[0]**2 + pB[1]**2 + pB[2]**2)
-        c = 10e-7 * self.q / plen**3
+        c = 10e-7 * self.q / plen**3 #Should be in m?  Need to get units right.
         b = numpy.cross(self.v, pB)
         for i in range(len(d)):
             b[i] *= c
@@ -74,8 +75,9 @@ class Electron(Particle):
     
     def __init__(self, windObj, po, vo):
         """Values pulled from https://en.wikipedia.org/wiki/Electron, July 15, 2016."""
-        self.q = -1.60217657e-19 #[C]
-        self.mass = 9.10938356e-31 #[kg]
+        Particle.__init__(self, windObj, -1.60217657e-19, 9.10938356e-31, po, vo)
+        #self.q = -1.60217657e-19 [C]
+        #self.mass = 9.10938356e-31 [kg]
         
 #class Positron(Particle):
 
@@ -91,7 +93,6 @@ class WireCoilPair(object):
     - Distance of center of loop from origin: d [cm]
     
     Note: This builds a pair of coils, parallel to one another, offset from the origin by a distance d.  There is no way to build a single wire loop, or to have the loops offset from one another.  Hence the name 'Wire Coil Pair'"""
-    
     def __init__(self, windObj, C, axis, N, I, R, d):
         self.C = C
         self.axis = axis
@@ -179,15 +180,18 @@ class WireCoilPair(object):
 class BField(object):
     """Calculate a number of B Field related things based on all B field producing elements."""
     
-    def __init__(self, windObj, BObjList):
+    def __init__(self, windObj, BObjList=[]):
         self.BObjList = BObjList
         self.windObj = windObj
         
     def totalBatP(self, p):
         Bx = By = Bz = 0
         for BObj in self.BObjList:
-            bx, by, bz = BObj.calcBatP((p[0], p[1], p[2]))
+            bx, by, bz = BObj.calcBatP(p)
             Bx += bx; By += by; Bz += bz
+        print "Tot:"
+        print Bx, By, Bz
+        print "=========="
         
         return [Bx, By, Bz]
     

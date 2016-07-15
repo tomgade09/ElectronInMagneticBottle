@@ -20,10 +20,9 @@ from VPyDraw import *
 def main():
     ind = 0                            #Index (Calculation Counter)
     t = 0                              #Initial time [s]
-    BList = []
     dt = 5*10**-9
     
-    e1center = [0.25,5,5]
+    e1center = [-4.75,0,0]
     e1vel = [1000,1000,1000]
     wccenter = [0,0,0]
     loopaxis = [1,0,0]
@@ -34,12 +33,13 @@ def main():
     
     wireCoils = WireCoilPair(windObj1, wccenter, loopaxis, 1, 1, 5, 5)
     wireCoils.initDraw()
-    BList.append(wireCoils)
     
-    electron1 = Particle(windObj1, 1.602e-19, 9.109e-31, e1center, e1vel)
+    electron1 = Electron(windObj1, e1center, e1vel)
     electron1.initDraw(10, 50)
     
-    B = BField(windObj1, BList)
+    B = BField(windObj1)
+    B.BObjList.append(wireCoils)
+    B.BObjList.append(electron1)
     #Use rotateVector to rotate to appropriate start point
     #B.drawBlines(windObj1, (-5, 0, -3.5), 0.1)
     #B.drawBlines(windObj1, (-5, -3.5, 0), 0.1)
@@ -52,7 +52,6 @@ def main():
         
         FPSrate(10000)
         Barray = B.totalBatP(electron1.p)
-        
         electron1.updP(Barray, dt)
         t += dt                  #time increase [s]
         ind += 1                 #index increase
