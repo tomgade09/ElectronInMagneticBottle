@@ -3,6 +3,7 @@ from __future__ import division
 from VPyDraw import *
 from scipy import integrate
 from math import *
+import numpy
 
 class Particle(object):
     """Define a particle to be placed in the specified magnetic field.
@@ -10,57 +11,64 @@ class Particle(object):
     Attributes of the particle:
     - Charge
     - Mass
-    - Position Vector (x,y,z)
-    - Velocity Vector (vx,vy,vz)"""
+    - Position Vector [px,py,pz]
+    - Velocity Vector [vx,vy,vz]
+    
+    Objects associated with the particle:
+    - wind - The window object where the particle is being drawn
+        - Note: if not using visualization, set this to 'None'
+    - pic - The visual point object representing the position of the particle"""
     
     def __init__(self, windObj, charge, mass, po, vo):
         """Initiate a particle object."""
+        self.wind = windObj
         self.charge = charge
         self.mass = mass
-        self.px = po[0]
-        self.py = po[1]
-        self.pz = po[2]
-        self.vx = vo[0]
-        self.vy = vo[1]
-        self.vz = vo[2]
+        self.p = po
+        self.v = vo
         self.eom = self.charge / self.mass
         self.pic = None
-        self.wind = windObj
 
     def initDraw(self, intrvl, traillng):
+        """Draw a point object representing the particle in the object specified by self.wind.  intrvl represents how often to 'draw' a point.  traillng represents how long of a 'trail' to leave behind the current position of the particle."""
         if self.pic != None:
             print "Pic has already been initialized.  Use updDraw to change the position."
             return
-        self.pic = drawParticlePic(self.wind, (self.px, self.py, self.pz), intrvl, traillng)
-        
+        self.pic = drawParticlePic(self.wind, self.p, intrvl, traillng)
         return self.pic
         
     def updDraw(self):
+        """Update the location of the point object drawn with initDraw.  Obviously, it can't be updated if it hasn't been initialized.  Use the initDraw function first."""        
         if self.pic == None:
             print "Pic has not been initialized.  Use initDraw to create a picture of the particle first."
             return
-        updateParticlePic(self.wind, self.pic, (self.px, self.py, self.pz))
+        updateParticlePic(self.wind, self.pic, self.p)
     
-    #def calcBatP(self, p)
+####def calcBatP(self, p):
     
-    def __updV(self, bx, by, bz, dt):
+    def __updV(self, b, dt):
         """Calculate the new velocity of the particle based on the specified B field."""
-        vXB_x = self.vy * bz - self.vz * by
-        vXB_y = self.vz * bx - self.vx * bz
-        vXB_z = self.vx * by - self.vy * bx
-        ax = self.eom * vXB_x
-        ay = self.eom * vXB_y
-        az = self.eom * vXB_z
-        self.vx += ax*dt
-        self.vy += ay*dt
-        self.vz += az*dt
+        a = numpy.cross(self.v, b)
+        for i in range(len(self.v)):
+            self.v[i] += self.eom * a[i] * dt
         
-    def updP(self, bx, by, bz, dt):
+    def updP(self, b, dt):
         """Calculate the new position based on the particle's velocity."""
-        self.__updV(bx, by, bz, dt)
-        self.px += self.vx * dt
-        self.py += self.vy * dt
-        self.pz += self.vz * dt
+        self.__updV(b, dt)
+        for i in range(len(self.p)):
+            self.p[i] += self.v[i] * dt
+            
+class Electron(Particle):
+    """Define an electron as a specific type of 'Particle'"""
+    
+    def __init__(self, windObj, po, vo):
+        """Values pulled from https://en.wikipedia.org/wiki/Electron, July 15, 2016."""
+        self.charge = -1.60217657e-19 #[C]
+        self.mass = 9.10938356e-31 #[kg]
+        
+#class Positron(Particle):
+
+#class Proton(Particle):
         
 class WireCoilPair(object):
     """Define a pair of wire coils to create a B field.
@@ -74,45 +82,47 @@ class WireCoilPair(object):
     Note: This builds a pair of coils, parallel to one another, offset from the origin by a distance d.  There is no way to build a single wire loop, or to have the loops offset from one another.  Hence the name 'Wire Coil Pair'"""
     
     def __init__(self, windObj, C, axis, N, I, R, d):
-        self.Cx = C[0]; self.Cy = C[1]; self.Cz = C[2]
-        self.axis_x = axis[0]; self.axis_y = axis[1]; self.axis_z = axis[2]
+        self.C = C
+        self.axis = axis
         self.N = N; self.I = I; self.R = R; self.d = d
         self.wind = windObj
         self.cst = float(self.N * self.I * 10**(-5))
         
-        if self.axis_x != 0 and self.axis_y == 0 and self.axis_z == 0:
-            #X axis - don't run code that's not necessary
+        if self.axis[0] != 0 and self.axis[1] == 0 and self.axis[2] == 0:
+            #X axis - no rotation, don't run code that's not necessary
             self.axiscf_theta = self.axiscf_phi = self.axis_phi = 0
             self.axis_theta = pi / 2
-        elif self.axis_x == 0 and self.axis_y == 0 and self.axis_z != 0:
+        elif self.axis[0] == 0 and self.axis[1] == 0 and self.axis[2] != 0:
             #Z axis - causes problems in spherical coordinate system
             self.axiscf_theta = - pi / 2; self.axiscf_phi = 0
             self.axis_theta = self.axis_phi = 0
         else:
             self.axis_rho, self.axis_theta, self.axis_phi = cartesianToSpherical(
-                self.axis_x, self.axis_y, self.axis_z)
+                self.axis[0], self.axis[1], self.axis[2])
             self.axiscf_theta = self.axis_theta - (pi / 2)
             self.axiscf_phi = self.axis_phi
 
     def initDraw(self):
-        if self.axis_theta == 0 and self.axis_phi == 0:
-            cntrt = (self.Cx, self.Cy, self.Cz + self.d)
-            cntlf = (self.Cx, self.Cy, self.Cz - self.d)
-        else:
+        if self.axis_theta == 0 and self.axis_phi == 0: #Z Axis calculate center points
+            cntrt = [self.C[0], self.C[1], self.C[2] + self.d]
+            cntlf = [self.C[0], self.C[1], self.C[2] - self.d]
+        else: #All other cases calculate center points for loops
             cntrt = sphericalToCartesian(self.d, self.axis_theta, self.axis_phi)
             if self.axis_phi > pi:
                 cntlf = sphericalToCartesian(self.d, pi-self.axis_theta, self.axis_phi-pi)
             else:
                 cntlf = sphericalToCartesian(self.d, pi-self.axis_theta, self.axis_phi+pi)
-            cntrt = (cntrt[0] + self.Cx, cntrt[1] + self.Cy, cntrt[2] + self.Cz)
-            cntlf = (cntlf[0] + self.Cx, cntlf[1] + self.Cy, cntlf[2] + self.Cz)
-        drawWireCoilPair(self.wind, (self.Cx, self.Cy, self.Cz), 
-            (self.axis_x, self.axis_y, self.axis_z), cntlf, cntrt, self.R)
+            #cntrt = [cntrt[0] + self.C[0], cntrt[1] + self.C[1], cntrt[2] + self.C[2]]
+            #cntlf = [cntlf[0] + self.C[0], cntlf[1] + self.C[1], cntlf[2] + self.C[2]]
+            for i in range(len(cntrt)):
+                cntrt[i] += self.C[i]; cntlf[i] += self.C[i]
+        drawWireCoilPair(self.wind, self.C, self.axis, cntlf, cntrt, self.R)
         
     def calcBatP(self, p):
         """Calculate the B field as a result of the wire coils at a position P."""
-        ppr = rotateVector(p[0] - self.Cx, p[1] - self.Cy, p[2] - self.Cz,
-            -self.axiscf_theta, -self.axiscf_phi)
+        pcnt = [p[0] - self.C[0], p[1] - self.C[1], p[2] - self.C[2]]
+        ppr = rotateVector(pcnt, -self.axiscf_theta, -self.axiscf_phi)
+########Add X, Z Axis conditions
         
         #Equations to Integrate
         lfdBx = lambda a: self.cst*(-self.R*ppr[2]*sin(a) - self.R*ppr[1]*cos(a) + 
@@ -147,8 +157,8 @@ class WireCoilPair(object):
         by = lfBy[0] + rtBy[0]
         bz = lfBz[0] + rtBz[0]
         
-        #if self.axiscf_theta == 0 and self.axiscf_phi == 0:
-            #return bx, by, bz
+        if self.axiscf_theta == 0 and self.axiscf_phi == 0:
+            return bx, by, bz
             
         bxprime, byprime, bzprime = rotateVector(bx, by, bz, self.axiscf_theta, 
             self.axiscf_phi)
@@ -163,46 +173,40 @@ class BField(object):
         self.windObj = windObj
         
     def totalBatP(self, p):
-        Bx = 0
-        By = 0
-        Bz = 0
+        Bx = By = Bz = 0
         for BObj in self.BObjList:
             bx, by, bz = BObj.calcBatP((p[0], p[1], p[2]))
-            Bx += bx
-            By += by
-            Bz += bz
+            Bx += bx; By += by; Bz += bz
         
-        return Bx, By, Bz
+        return [Bx, By, Bz]
     
-    def drawBlines(self, windObj, Po, linedist):
-        px = Po[0]
-        py = Po[1]
-        pz = Po[2]
-    
+    def drawBlines(self, windObj, po, linedist):
+        px = po[0]; py = po[1]; pz = po[2]
+#########Need better boundary conditions, but not sure how to define at this time
+        #Maybe pass in an argument for bounds
         while px < 5:
-            bx, by, bz = self.totalBatP((px, py, pz))
+            bx, by, bz = self.totalBatP([px, py, pz])
             #normfact = linedist / sqrt(bx**2 + by**2 + bz**2)
             normfact = 10000
-        
-            bxn = bx * normfact
-            byn = by * normfact
-            bzn = bz * normfact
-        
-            drawLine(windObj, (px, py, pz), (bxn, byn, bzn))
-        
-            px += bxn
-            py += byn
-            pz += bzn
+            bx *= normfact; by *= normfact; bz *= normfact        
+            drawLine(windObj, [px, py, pz], [bx, by, bz])
+            px += bx; py += by; pz += bz
 
-def cartesianToSpherical(x, y, z):
-    rho = sqrt(x**2 + y**2 + z**2)
-    theta = acos(z / rho)
-    phi = atan2(y, x)
+def cartesianToSpherical(a):
+    """Convert cartesian coords to spherical."""
+    rho = sqrt(a[0]**2 + a[1]**2 + a[2]**2)
+    if a[0] == 0 and a[1] == 0 and a[2] != 0: #Z axis case
+        theta = phi = 0
+        return rho, theta, phi
+    
+    theta = acos(a[2] / rho)
+    phi = atan2(a[1], a[0])
     
     return rho, theta, phi
 
 def sphericalToCartesian(rho, theta, phi):
-    if theta == 0:
+    """Convert spherical coords to cartesian."""
+    if theta == 0: #Z axis case
         x = y = 0
         z = rho
     else:
@@ -210,17 +214,17 @@ def sphericalToCartesian(rho, theta, phi):
         y = rho * sin(theta) * sin(phi)
         z = rho * cos(theta)
     
-    return x, y, z
+    return [x, y, z]
     
-def rotateVector(x, y, z, rot_theta, rot_phi):
-    if rot_theta == -pi / 2:
-        xprm = - z; yprm = y; zprm = x
+def rotateVector(v, rot_theta, rot_phi):
+    """Rotate a vector, v by rot_theta and rot_phi.  You can guess which corresponds to theta and which corresponds to phi."""
+    if rot_theta == -pi / 2: #Z axis case
+        xprm = - v[2]; yprm = v[1]; zprm = v[0]
         return xprm, yprm, zprm
-    elif rot_theta == rot_phi == 0:
-        return x, y, z
-    
-    tmp_rho, tmp_theta, tmp_phi = cartesianToSpherical(x, y, z)
-    xprm, yprm, zprm = sphericalToCartesian(tmp_rho, tmp_theta + rot_theta, tmp_phi +
+    elif rot_theta == rot_phi == 0: #X axis case
+        return v
+    tmp_rho, tmp_theta, tmp_phi = cartesianToSpherical(v)
+    vprm = sphericalToCartesian(tmp_rho, tmp_theta + rot_theta, tmp_phi +
         rot_phi)
     
-    return xprm, yprm, zprm
+    return vprm

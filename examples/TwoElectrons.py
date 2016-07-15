@@ -23,21 +23,23 @@ def main():
     BList = []
     dt = 5*10**-9
     
-    e1center = [0.25,5,5]
-    e1vel = [1000,1000,1000]
-    wccenter = [5,5,5]
-    loopaxis = [1,0,0]
+    e1center = (5, 0.25, 5)
+    e1vel = (-1000, 1000, 1000)
     
     # Draw some things
     windObj1 = drawWindow(1920, 1080, e1center)
     relclockObj1 = drawTimeClock(windObj1, t)
     
-    wireCoils = WireCoilPair(windObj1, wccenter, loopaxis, 1, 1, 5, 5)
+    wireCoils = WireCoilPair(windObj1, (5, 5, 5), (0, 1, 0), 1, 1, 5, 5)
     wireCoils.initDraw()
     BList.append(wireCoils)
     
-    electron1 = Particle(windObj1, 1.602e-19, 9.109e-31, e1center, e1vel)
+    electron1 = Particle(windObj1, -1.76*10**11, 1, e1center, e1vel)
     electron1.initDraw(10, 50)
+    
+    #electron2 = Particle(windObj1, -1.76*10**11, 1, (4.75, 0, 0), (-1000, -1000, -1000))
+    #electron2.initDraw(10, 50)
+    #electron2.color=color.yellow
     
     B = BField(windObj1, BList)
     #Use rotateVector to rotate to appropriate start point
@@ -46,17 +48,19 @@ def main():
     #B.drawBlines(windObj1, (-5, 0, 3.5), 0.1)
     #B.drawBlines(windObj1, (-5, 3.5, 0), 0.1)
     
-    while ((-10 + wccenter[0]) <= electron1.p[0] <= (10 + wccenter[0])) and ((-10 + 
-            wccenter[1]) <= electron1.p[1] <= (10 + wccenter[1])) and ((-10 + 
-            wccenter[2]) <= electron1.p[2] <= (10 + wccenter[2])):
-        
+    #while (-10 <= x <= 10) and (-10 <= y <= 10) and (-10 <= z <= 10):
+    while t < 0.001:
         FPSrate(10000)
-        Barray = B.totalBatP(electron1.p)
+        Bx, By, Bz = B.totalBatP((electron1.px, electron1.py, electron1.pz))
+        #Bx, By, Bz = wireCoils.calcBatP((electron1.px, electron1.py, electron1.pz))
+        #Bxs, Bys, Bzs = wireCoils.calcBatP((electron2.px, electron2.py, electron2.pz))
         
-        electron1.updP(Barray, dt)
+        electron1.updP(Bx, By, Bz, dt)
+        #electron2.updP(Bxs, Bys, Bzs, dt)
         t += dt                  #time increase [s]
         ind += 1                 #index increase
         electron1.updDraw()
+        #electron2.updDraw()
         updateTimeClock(windObj1, relclockObj1, t)
 
 if __name__ == "__main__":
