@@ -9,7 +9,7 @@ class Particle(object):
     """Define a particle to be placed in the specified magnetic field.
     
     Attributes of the particle:
-    - Charge
+    - Charge (q)
     - Mass
     - Position Vector [px,py,pz]
     - Velocity Vector [vx,vy,vz]
@@ -22,11 +22,11 @@ class Particle(object):
     def __init__(self, windObj, charge, mass, po, vo):
         """Initiate a particle object."""
         self.wind = windObj
-        self.charge = charge
+        self.q = charge
         self.mass = mass
         self.p = po
         self.v = vo
-        self.eom = self.charge / self.mass
+        self.eom = self.q / self.mass
         self.pic = None
 
     def initDraw(self, intrvl, traillng):
@@ -44,7 +44,18 @@ class Particle(object):
             return
         updateParticlePic(self.wind, self.pic, self.p)
     
-####def calcBatP(self, p):
+    def calcBatP(self, pB):
+        for i in range(len(pB)):
+            pB[i] -= self.p[i]
+        if abs(pB[0]) <= 10e-15 and abs(pB[1]) <= 10e-15 and abs(pB[2]) <=10e-15:
+            return 0, 0, 0
+        plen = sqrt(pB[0]**2 + pB[1]**2 + pB[2]**2)
+        c = 10e-7 * self.q / plen**3
+        b = numpy.cross(self.v, pB)
+        for i in range(len(d)):
+            b[i] *= c
+        
+        return b[0], b[1], b[2]
     
     def __updV(self, b, dt):
         """Calculate the new velocity of the particle based on the specified B field."""
@@ -63,7 +74,7 @@ class Electron(Particle):
     
     def __init__(self, windObj, po, vo):
         """Values pulled from https://en.wikipedia.org/wiki/Electron, July 15, 2016."""
-        self.charge = -1.60217657e-19 #[C]
+        self.q = -1.60217657e-19 #[C]
         self.mass = 9.10938356e-31 #[kg]
         
 #class Positron(Particle):

@@ -25,7 +25,7 @@ def main():
     
     e1center = [0.25,5,5]
     e1vel = [1000,1000,1000]
-    wccenter = [5,5,5]
+    wccenter = [0,0,0]
     loopaxis = [1,0,0]
     
     # Draw some things
