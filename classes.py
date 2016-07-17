@@ -46,6 +46,7 @@ class Particle(object):
     
     def calcBatP(self, pB):
         #Needs some work
+        pB = pB[:]
         for i in range(len(pB)):
             pB[i] -= self.p[i]
         if abs(pB[0]) <= 10e-15 and abs(pB[1]) <= 10e-15 and abs(pB[2]) <=10e-15:
@@ -189,9 +190,11 @@ class BField(object):
         for BObj in self.BObjList:
             bx, by, bz = BObj.calcBatP(p)
             Bx += bx; By += by; Bz += bz
-        print "Tot:"
-        print Bx, By, Bz
-        print "=========="
+            #print BObj
+            #print bx, by, bz
+        #print "---------"
+        #print Bx, By, Bz
+        #print "=================="
         
         return [Bx, By, Bz]
     
