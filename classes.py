@@ -18,7 +18,6 @@ class Particle(object):
     - wind - The window object where the particle is being drawn
         - Note: if not using visualization, set this to 'None'
     - pic - The visual point object representing the position of the particle"""
-    
     def __init__(self, windObj, charge, mass, po, vo):
         """Initiate a particle object."""
         self.wind = windObj
@@ -45,8 +44,8 @@ class Particle(object):
         updateParticlePic(self.wind, self.pic, self.p)
     
     def calcBatP(self, pB):
-        #Needs some work
-        pB = pB[:]
+        """Calculate B at a point pB due to this particle."""
+        pB = pB[:] #If particle.p is passed in, need to change pB to a list vs a pointer
         for i in range(len(pB)):
             pB[i] -= self.p[i]
         if abs(pB[0]) <= 10e-15 and abs(pB[1]) <= 10e-15 and abs(pB[2]) <=10e-15:
@@ -73,16 +72,21 @@ class Particle(object):
             
 class Electron(Particle):
     """Define an electron as a specific type of 'Particle'"""
-    
     def __init__(self, windObj, po, vo):
         """Values pulled from https://en.wikipedia.org/wiki/Electron, July 15, 2016."""
         Particle.__init__(self, windObj, -1.60217657e-19, 9.10938356e-31, po, vo)
-        #self.q = -1.60217657e-19 [C]
-        #self.mass = 9.10938356e-31 [kg]
         
-#class Positron(Particle):
+class Positron(Particle):
+    """Define a positron as a specific type of 'Particle'"""
+    def __init__(self, windObj, po, vo):
+        """Values pulled from https://en.wikipedia.org/wiki/Positron, July 17, 2016."""
+        Particle.__init__(self, windObj, 1.60217657e-19, 9.10938291e-31, po, vo)
 
-#class Proton(Particle):
+class Proton(Particle):
+    """Define a proton as a specific type of 'Particle'"""
+    def __init__(self, windObj, po, vo):
+        """Values pulled from https://en.wikipedia.org/wiki/Positron, July 17, 2016."""
+        Particle.__init__(self, windObj, 1.60217662e-19, 1.67262190e-27, po, vo)
         
 class WireCoilPair(object):
     """Define a pair of wire coils to create a B field.
@@ -95,6 +99,7 @@ class WireCoilPair(object):
     
     Note: This builds a pair of coils, parallel to one another, offset from the origin by a distance d.  There is no way to build a single wire loop, or to have the loops offset from one another.  Hence the name 'Wire Coil Pair'"""
     def __init__(self, windObj, C, axis, N, I, R, d):
+        """Initiate a WireCoilPair object."""
         self.C = C
         self.axis = axis
         self.N = N; self.I = I; self.R = R; self.d = d
@@ -116,6 +121,7 @@ class WireCoilPair(object):
             self.axiscf_phi = self.axis_phi
 
     def initDraw(self):
+        """Draw the pair of Wire Coils."""
         if self.axis_theta == 0 and self.axis_phi == 0: #Z Axis calculate center points
             cntrt = [self.C[0], self.C[1], self.C[2] + self.d]
             cntlf = [self.C[0], self.C[1], self.C[2] - self.d]
@@ -179,26 +185,23 @@ class WireCoilPair(object):
         return bxprime, byprime, bzprime
 
 class BField(object):
-    """Calculate a number of B Field related things based on all B field producing elements."""
-    
+    """Define a B Field object containing the elements in BObjList."""
     def __init__(self, windObj, BObjList=[]):
+        """Initialize a B Field object."""
         self.BObjList = BObjList
         self.windObj = windObj
         
     def totalBatP(self, p):
+        """Calculate total B at p due to all objects in BObjList.  Calculates them one at a time and adds them together."""
         Bx = By = Bz = 0
         for BObj in self.BObjList:
             bx, by, bz = BObj.calcBatP(p)
             Bx += bx; By += by; Bz += bz
-            #print BObj
-            #print bx, by, bz
-        #print "---------"
-        #print Bx, By, Bz
-        #print "=================="
         
         return [Bx, By, Bz]
     
     def drawBlines(self, windObj, po, linedist):
+        """Draw B field lines starting at po and ending at ####."""
         px = po[0]; py = po[1]; pz = po[2]
 #########Need better boundary conditions, but not sure how to define at this time
         #Maybe pass in an argument for bounds
