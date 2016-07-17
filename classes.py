@@ -3,7 +3,7 @@ from __future__ import division
 from VPyDraw import *
 from scipy import integrate
 from math import *
-import numpy
+import numpy as np
 
 class Particle(object):
     """Define a particle to be placed in the specified magnetic field.
@@ -20,6 +20,7 @@ class Particle(object):
     - pic - The visual point object representing the position of the particle"""
     def __init__(self, windObj, charge, mass, po, vo):
         """Initiate a particle object."""
+########Consider making the lists numpy arrays for easy math operations iterated over list
         self.wind = windObj
         self.q = charge
         self.mass = mass
@@ -46,28 +47,27 @@ class Particle(object):
     def calcBatP(self, pB):
         """Calculate B at a point pB due to this particle."""
         pB = pB[:] #If particle.p is passed in, need to change pB to a list vs a pointer
-        for i in range(len(pB)):
-            pB[i] -= self.p[i]
+        pB += np.array(self.p)
         if abs(pB[0]) <= 10e-15 and abs(pB[1]) <= 10e-15 and abs(pB[2]) <=10e-15:
             return 0, 0, 0
         plen = sqrt(pB[0]**2 + pB[1]**2 + pB[2]**2)
         c = 10e-7 * self.q / plen**3 #Should be in m?  Need to get units right.
-        b = numpy.cross(self.v, pB)
-        for i in range(len(d)):
+        b = np.cross(self.v, pB)
+        for i in range(3):
             b[i] *= c
         
         return b[0], b[1], b[2]
     
     def __updV(self, b, dt):
         """Calculate the new velocity of the particle based on the specified B field."""
-        a = numpy.cross(self.v, b)
-        for i in range(len(self.v)):
+        a = np.cross(self.v, b)
+        for i in range(3):
             self.v[i] += self.eom * a[i] * dt
         
     def updP(self, b, dt):
         """Calculate the new position based on the particle's velocity."""
         self.__updV(b, dt)
-        for i in range(len(self.p)):
+        for i in range(3):
             self.p[i] += self.v[i] * dt
             
 class Electron(Particle):
@@ -133,7 +133,7 @@ class WireCoilPair(object):
                 cntlf = sphericalToCartesian(self.d, pi-self.axis_theta, self.axis_phi+pi)
             #cntrt = [cntrt[0] + self.C[0], cntrt[1] + self.C[1], cntrt[2] + self.C[2]]
             #cntlf = [cntlf[0] + self.C[0], cntlf[1] + self.C[1], cntlf[2] + self.C[2]]
-            for i in range(len(cntrt)):
+            for i in range(3):
                 cntrt[i] += self.C[i]; cntlf[i] += self.C[i]
         drawWireCoilPair(self.wind, self.C, self.axis, cntlf, cntrt, self.R)
         
