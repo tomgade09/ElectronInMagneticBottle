@@ -56,6 +56,7 @@ def main():
         ind += 1                 #index increase
         electron1.updDraw()
         updateTimeClock(windObj1, relclockObj1, t)
+        print electron1.p
 
 if __name__ == "__main__":
     main()

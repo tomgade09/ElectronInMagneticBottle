@@ -20,7 +20,6 @@ class Particle(object):
     - pic - The visual point object representing the position of the particle"""
     def __init__(self, windObj, charge, mass, po, vo):
         """Initiate a particle object."""
-########Consider making the lists numpy arrays for easy math operations iterated over list
         self.wind = windObj
         self.q = charge
         self.mass = mass
@@ -53,20 +52,19 @@ class Particle(object):
         plen = sqrt(pB[0]**2 + pB[1]**2 + pB[2]**2)
         c = 10e-7 * self.q / plen**3 #Should be in m?  Need to get units right.
         b = np.cross(self.v, pB)
-        for i in range(3):
-            b[i] *= c
+        b = np.array(b) * c
         
         return b[0], b[1], b[2]
     
     def __updV(self, b, dt):
         """Calculate the new velocity of the particle based on the specified B field."""
-        a = np.cross(self.v, b)
-        for i in range(3):
-            self.v[i] += self.eom * a[i] * dt
+        a = np.cross(self.v, b) * self.eom * dt
+        self.v += a
         
     def updP(self, b, dt):
         """Calculate the new position based on the particle's velocity."""
         self.__updV(b, dt)
+        #self.p += self.v * dt #For some reason, doesn't work, but would be quicker.
         for i in range(3):
             self.p[i] += self.v[i] * dt
             
@@ -100,8 +98,8 @@ class WireCoilPair(object):
     Note: This builds a pair of coils, parallel to one another, offset from the origin by a distance d.  There is no way to build a single wire loop, or to have the loops offset from one another.  Hence the name 'Wire Coil Pair'"""
     def __init__(self, windObj, C, axis, N, I, R, d):
         """Initiate a WireCoilPair object."""
-        self.C = C
-        self.axis = axis
+        self.C = np.array(C)
+        self.axis = np.array(axis)
         self.N = N; self.I = I; self.R = R; self.d = d
         self.wind = windObj
         self.cst = float(self.N * self.I * 10**(-5))
@@ -131,10 +129,7 @@ class WireCoilPair(object):
                 cntlf = sphericalToCartesian(self.d, pi-self.axis_theta, self.axis_phi-pi)
             else:
                 cntlf = sphericalToCartesian(self.d, pi-self.axis_theta, self.axis_phi+pi)
-            #cntrt = [cntrt[0] + self.C[0], cntrt[1] + self.C[1], cntrt[2] + self.C[2]]
-            #cntlf = [cntlf[0] + self.C[0], cntlf[1] + self.C[1], cntlf[2] + self.C[2]]
-            for i in range(3):
-                cntrt[i] += self.C[i]; cntlf[i] += self.C[i]
+            cntrt += self.C; cntlf += self.C
         drawWireCoilPair(self.wind, self.C, self.axis, cntlf, cntrt, self.R)
         
     def calcBatP(self, p):
