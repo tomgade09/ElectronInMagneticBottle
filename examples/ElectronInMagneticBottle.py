@@ -42,16 +42,19 @@ def main():
     
     while ((-10 + wccenter[0]) <= electron1.p[0] <= (10 + wccenter[0])) and ((-10 + 
             wccenter[1]) <= electron1.p[1] <= (10 + wccenter[1])) and ((-10 + 
-            wccenter[2]) <= electron1.p[2] <= (10 + wccenter[2])):
+            wccenter[2]) <= electron1.p[2] <= (10 + wccenter[2])):      
         FPSrate(10000)
         Barray = B.totalBatP(electron1.p)
         electron1.updP(Barray, dt)
         electron1.updDraw()
-        
+
         t += dt                  #time increase [s]
         ind += 1                 #index increase
         updateTimeClock(windObj1, relclockObj1, t)
         #print electron1.p
+    
+    while True:
+        FPSrate(10000)
 
 if __name__ == "__main__":
     main()

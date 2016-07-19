@@ -24,8 +24,7 @@ def drawParticlePic(windObj, po, intrvl, traillng):
     windObj.select()
     particle = sphere(pos=(po[0],po[1],po[2]), radius=0.0000001, color=color.green,
         make_trail=True, trail_type="points", interval=intrvl, retain=traillng)
-    #particle.trail_object.color = color.yellow
-        
+    
     return particle
     
 def updateParticlePic(windObj, partObj, p):
@@ -60,3 +59,12 @@ def drawWireCoilPair(windObj, C, norm, cntlf, cntrt, R):
     
 def FPSrate(fps):
     rate(fps)
+    
+#Needs work
+def keyInput(evt):
+    #global key
+    #key = evt.key
+    return
+
+def inputHandler():
+    scene.bind('keydown', keyInput)

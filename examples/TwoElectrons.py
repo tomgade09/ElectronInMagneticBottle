@@ -18,8 +18,8 @@ def main():
     
     e1center = [-4.75,0,0]
     e1vel = [1000,1000,1000]
-    e1center = [4.75,0,0]
-    e1vel = [-1000,-1000,-1000]
+    e2center = [4.75,0,0]
+    e2vel = [-1000,-1000,-1000]
     wccenter = [0,0,0]
     loopaxis = [1,0,0]
     
@@ -35,7 +35,7 @@ def main():
     
     electron2 = Electron(windObj1, e2center, e2vel)
     electron2.initDraw(10, 50)
-    #electron2.color=color.yellow
+    electron2.color=color.yellow
     
     B = BField(windObj1)
     B.BObjList.append(wireCoils)
@@ -62,6 +62,10 @@ def main():
         ind += 1                 #index increase
         updateTimeClock(windObj1, relclockObj1, t)
         #print electron1.p
+        #print electron2.p
+        
+    while True:
+        FPSrate(10000)
 
 if __name__ == "__main__":
     main()
