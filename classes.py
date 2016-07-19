@@ -99,10 +99,10 @@ class WireCoilPair(object):
     - Distance of center of loop from origin: d [cm]
     
     Note: This builds a pair of coils, parallel to one another, offset from the origin by a distance d.  There is no way to build a single wire loop, or to have the loops offset from one another.  Hence the name 'Wire Coil Pair'"""
-    def __init__(self, windObj, C, axis, N, I, R, d, name=None):
+    def __init__(self, windObj, Cpair, axis, N, I, R, d, name=None):
         """Initiate a WireCoilPair object."""
         self.wind = windObj
-        self.C = np.array(C)
+        self.Cpair = np.array(Cpair)
         self.axis = np.array(axis)
         self.N = N; self.I = I; self.R = R; self.d = d
         self.name = name
@@ -124,26 +124,26 @@ class WireCoilPair(object):
             self.axiscf_phi = self.axis_phi
 
         if self.axis_theta == 0 and self.axis_phi == 0: #Z Axis calculate center points
-            self.rtLoopCnt = [self.C[0], self.C[1], self.C[2] + self.d]
-            self.lfLoopCnt = [self.C[0], self.C[1], self.C[2] - self.d]
+            self.Cright = [self.Cpair[0], self.Cpair[1], self.Cpair[2] + self.d]
+            self.Cleft = [self.Cpair[0], self.Cpair[1], self.Cpair[2] - self.d]
         else: #All other cases calculate center points for loops
-            self.rtLoopCnt = sphericalToCartesian(self.d, self.axis_theta, self.axis_phi)
+            self.Cright = sphericalToCartesian(self.d, self.axis_theta, self.axis_phi)
             if self.axis_phi > pi:
-                self.lfLoopCnt = sphericalToCartesian(self.d, pi-self.axis_theta,
+                self.Cleft = sphericalToCartesian(self.d, pi-self.axis_theta,
                     self.axis_phi-pi)
             else:
-                self.lfLoopCnt = sphericalToCartesian(self.d, pi-self.axis_theta,
+                self.Cleft = sphericalToCartesian(self.d, pi-self.axis_theta,
                     self.axis_phi+pi)
-            self.rtLoopCnt += self.C; self.lfLoopCnt += self.C
+            self.Cright += self.Cpair; self.Cleft += self.Cpair
 
     def initDraw(self):
         """Draw the pair of Wire Coils."""
-        self.pic = drawWireCoilPair(self.wind, self.C, self.axis, self.lfLoopCnt,
-            self.rtLoopCnt, self.R)
+        self.pic = drawWireCoilPair(self.wind, self.Cpair, self.axis, self.Cleft,
+            self.Cright, self.R)
         
     def calcBatP(self, p):
         """Calculate the B field as a result of the wire coils at a position P."""
-        pcnt = [p[0] - self.C[0], p[1] - self.C[1], p[2] - self.C[2]]
+        pcnt = [p[0] - self.Cpair[0], p[1] - self.Cpair[1], p[2] - self.Cpair[2]]
         ppr = rotateVector(pcnt, -self.axiscf_theta, -self.axiscf_phi)
 ########Add X, Z Axis conditions
         
@@ -206,12 +206,12 @@ class BField(object):
         return [Bx, By, Bz]
     #####Need to test this code out below
     def drawBlines(self, windObj, p, pupbound=None, plobound=None, numiter=None, 
-        linelength=None):
+        linelength=None, multlng=None):
         """Draw B field lines starting at po and ending at ####."""
         loopind = 0
         BoundBool = True
         while BoundBool:
-            for i in [pupbound, plobound]:
+            for i in [pupbound, plobound]: #Need to account for lower bound p > lobound
                 if i[0] != None:
                     BoundBool = BoundBool and p[0] <= i[0]
                 if i[1] != None:
@@ -226,12 +226,12 @@ class BField(object):
             
             if linelength != None:
                 Blen, Bth, Bphi = cartesianToSpherical([bx,by,bz])
-                b = sphericalToCartesian(linelength, Bth, Bphi)
-            else:
-                b *= 10000
+                bx, by, bz = sphericalToCartesian(linelength, Bth, Bphi)
+            elif multlng != None:
+                bx *= multlng; by *= multlng; bz *= multlng
             
-            drawLine(windObj, p, b)
-            p += b
+            drawLine(windObj, p, [bx,by,bz])
+            p[0] += bx; p[1] += by; p[2] += bz
     #####Test this code out ^^^^^
 def cartesianToSpherical(a):
     """Convert cartesian coords to spherical."""
