@@ -54,8 +54,10 @@ def drawLine(windObj, p, laxis):
         
 def drawWireCoilPair(windObj, C, norm, cntlf, cntrt, R):
     windObj.select()
-    ring(pos=cntlf, axis=norm, radius=R, thickness=0.01)
-    ring(pos=cntrt, axis=norm, radius=R, thickness=0.01)
+    objlf = ring(pos=cntlf, axis=norm, radius=R, thickness=0.01)
+    objrt = ring(pos=cntrt, axis=norm, radius=R, thickness=0.01)
+    
+    return [objlf, objrt]
     
 def FPSrate(fps):
     rate(fps)

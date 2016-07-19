@@ -105,6 +105,7 @@ class WireCoilPair(object):
         self.N = N; self.I = I; self.R = R; self.d = d
         self.wind = windObj
         self.cst = float(self.N * self.I * 10**(-5))
+        self.pic = None
         
         if self.axis[0] != 0 and self.axis[1] == 0 and self.axis[2] == 0:
             #X axis - no rotation, don't run code that's not necessary
@@ -135,8 +136,8 @@ class WireCoilPair(object):
 
     def initDraw(self):
         """Draw the pair of Wire Coils."""
-        drawWireCoilPair(self.wind, self.C, self.axis, self.lfLoopCnt, self.rtLoopCnt,
-            self.R)
+        self.pic = drawWireCoilPair(self.wind, self.C, self.axis, self.lfLoopCnt,
+            self.rtLoopCnt, self.R)
         
     def calcBatP(self, p):
         """Calculate the B field as a result of the wire coils at a position P."""
