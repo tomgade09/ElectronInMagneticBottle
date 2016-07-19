@@ -192,7 +192,7 @@ class BField(object):
     def __init__(self, windObj, BObjList=[], name=None):
         """Initialize a B Field object."""
         self.windObj = windObj
-        self.BObjList = BObjList #Somehow when two B Obj are defined, this is shared btw
+        self.BObjList = BObjList[:] #Somehow when two B Obj are defined, this is shared btw
         self.name = name
         
     def totalBatP(self, p):
@@ -203,20 +203,35 @@ class BField(object):
             Bx += bx; By += by; Bz += bz
         
         return [Bx, By, Bz]
-    
-    def drawBlines(self, windObj, po, pboundary):
+    #####Need to test this code out below
+    def drawBlines(self, windObj, p, pupbound=None, plobound=None, numiter=None, 
+        linelength=None):
         """Draw B field lines starting at po and ending at ####."""
-        px = po[0]; py = po[1]; pz = po[2]
-#########Need better boundary conditions, but not sure how to define at this time
-        #Maybe pass in an argument for bounds
-        while px < 5:
-            bx, by, bz = self.totalBatP([px, py, pz])
-            #normfact = linedist / sqrt(bx**2 + by**2 + bz**2)
-            normfact = 10000
-            bx *= normfact; by *= normfact; bz *= normfact        
-            drawLine(windObj, [px, py, pz], [bx, by, bz])
-            px += bx; py += by; pz += bz
-
+        loopind = 0
+        BoundBool = True
+        while BoundBool:
+            for i in [pupbound, plobound]:
+                if i[0] != None:
+                    BoundBool = BoundBool and p[0] <= i[0]
+                if i[1] != None:
+                    BoundBool = BoundBool and p[1] <= i[1]
+                if i[2] != None:
+                    BoundBool = BoundBool and p[2] <= i[2]
+            if numiter != None:
+                loopind += 1
+                BoundBool = BoundBool and loopind < numiter
+            
+            np.array(b) = self.totalBatP(p)
+            
+            if linelength != None:
+                Blen, Bth, Bphi = cartesianToSpherical(b)
+                b = sphericalToCartesian(linelength, Bth, Bphi)
+            else:
+                b *= 10000
+            
+            drawLine(windObj, p, b)
+            p += b
+    #####Test this code out ^^^^^
 def cartesianToSpherical(a):
     """Convert cartesian coords to spherical."""
     rho = sqrt(a[0]**2 + a[1]**2 + a[2]**2)

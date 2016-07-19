@@ -14,7 +14,7 @@ from VPyDraw import *
 def main():
     ind = 0                            #Index (Calculation Counter)
     t = 0                              #Initial time [s]
-    dt = 5*10**-9
+    dt = 5*10**-8
     
     evel = [1000,1000,1000]
     e1center = [-10.75,0,0]
@@ -40,13 +40,13 @@ def main():
     electron2.initDraw(10, 50, color.yellow)
     
     #Define 2 separate B Fields that don't interact with each other.
-    B1 = BField(windObj1, [wireCoils1,electron1])
-    #B1.BObjList.append(wireCoils1) #Somehow this code appends these objects to both lists
-    #B1.BObjList.append(electron1)
+    B1 = BField(windObj1)
+    B1.BObjList.append(wireCoils1)
+    B1.BObjList.append(electron1)
     
-    B2 = BField(windObj1, [wireCoils2,electron2])
-    #B2.BObjList.append(wireCoils2) #Somehow this code appends these objects to both lists
-    #B2.BObjList.append(electron2)
+    B2 = BField(windObj1)
+    B2.BObjList.append(wireCoils2)
+    B2.BObjList.append(electron2)
     #Need to update drawBlines for appropriate boundary conditions, then uncomment below
     #for i in [[-5,0,-3.5],[-5,-3.5,0],[-5,0,3.5],[-5,3.5,0]]:
         #j = rotateVector(i,wireCoils.axis_theta,wireCoils.axis_phi)
