@@ -20,9 +20,9 @@ def drawWindow(wd, ht, cent):
     
     return windObj
     
-def drawParticlePic(windObj, po, intrvl, traillng):
+def drawParticlePic(windObj, po, intrvl, traillng, pcolor):
     windObj.select()
-    particle = sphere(pos=(po[0],po[1],po[2]), radius=0.0000001, color=color.green,
+    particle = sphere(pos=(po[0],po[1],po[2]), radius=0.0000001, color=pcolor,
         make_trail=True, trail_type="points", interval=intrvl, retain=traillng)
     
     return particle
@@ -31,9 +31,9 @@ def updateParticlePic(windObj, partObj, p):
     windObj.select()
     partObj.pos = (p[0],p[1],p[2])
 
-def drawTimeClock(windObj, to):
+def drawTimeClock(windObj, po, to):
     windObj.select()
-    relclockObj = label(pos=(-6.5, 0, 0), text='t = ' + str(to) + ' s')
+    relclockObj = label(pos=po, text='t = ' + str(to) + ' s')
     
     return relclockObj
 

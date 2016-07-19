@@ -30,12 +30,12 @@ class Particle(object):
         self.eom = self.q / self.mass
         self.pic = None
 
-    def initDraw(self, intrvl, traillng):
+    def initDraw(self, intrvl, traillng, Dcolor=color.green):
         """Draw a point object representing the particle in the object specified by self.wind.  intrvl represents how often to 'draw' a point.  traillng represents how long of a 'trail' to leave behind the current position of the particle."""
         if self.pic != None:
             print "Pic has already been initialized.  Use updDraw to change the position."
             return
-        self.pic = drawParticlePic(self.wind, self.p, intrvl, traillng)
+        self.pic = drawParticlePic(self.wind, self.p, intrvl, traillng, Dcolor)
         return self.pic
         
     def updDraw(self):
@@ -98,12 +98,13 @@ class WireCoilPair(object):
     - Distance of center of loop from origin: d [cm]
     
     Note: This builds a pair of coils, parallel to one another, offset from the origin by a distance d.  There is no way to build a single wire loop, or to have the loops offset from one another.  Hence the name 'Wire Coil Pair'"""
-    def __init__(self, windObj, C, axis, N, I, R, d):
+    def __init__(self, windObj, C, axis, N, I, R, d, name=None):
         """Initiate a WireCoilPair object."""
+        self.wind = windObj
         self.C = np.array(C)
         self.axis = np.array(axis)
         self.N = N; self.I = I; self.R = R; self.d = d
-        self.wind = windObj
+        self.name = name
         self.cst = float(self.N * self.I * 10**(-5))
         self.pic = None
         
@@ -188,10 +189,11 @@ class WireCoilPair(object):
 
 class BField(object):
     """Define a B Field object containing the elements in BObjList."""
-    def __init__(self, windObj, BObjList=[]):
+    def __init__(self, windObj, BObjList=[], name=None):
         """Initialize a B Field object."""
-        self.BObjList = BObjList
         self.windObj = windObj
+        self.BObjList = BObjList #Somehow when two B Obj are defined, this is shared btw
+        self.name = name
         
     def totalBatP(self, p):
         """Calculate total B at p due to all objects in BObjList.  Calculates them one at a time and adds them together."""
