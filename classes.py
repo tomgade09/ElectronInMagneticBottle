@@ -20,13 +20,14 @@ class Particle(object):
     - wind - The window object where the particle is being drawn
         - Note: if not using visualization, set this to 'None'
     - pic - The visual point object representing the position of the particle"""
-    def __init__(self, windObj, charge, mass, po, vo):
+    def __init__(self, windObj, charge, mass, po, vo, name=None):
         """Initiate a particle object."""
         self.wind = windObj
         self.q = charge
         self.mass = mass
         self.p = po
         self.v = vo
+        self.name = name
         self.eom = self.q / self.mass
         self.pic = None
 
@@ -192,7 +193,7 @@ class BField(object):
     def __init__(self, windObj, BObjList=[], name=None):
         """Initialize a B Field object."""
         self.windObj = windObj
-        self.BObjList = BObjList[:] #Somehow when two B Obj are defined, this is shared btw
+        self.BObjList = BObjList[:]
         self.name = name
         
     def totalBatP(self, p):
@@ -221,10 +222,10 @@ class BField(object):
                 loopind += 1
                 BoundBool = BoundBool and loopind < numiter
             
-            np.array(b) = self.totalBatP(p)
+            bx, by, bz = self.totalBatP(p)
             
             if linelength != None:
-                Blen, Bth, Bphi = cartesianToSpherical(b)
+                Blen, Bth, Bphi = cartesianToSpherical([bx,by,bz])
                 b = sphericalToCartesian(linelength, Bth, Bphi)
             else:
                 b *= 10000
