@@ -46,11 +46,12 @@ def main():
         FPSrate(10000)
         Barray = B.totalBatP(electron1.p)
         electron1.updP(Barray, dt)
+        electron1.updDraw()
+        
         t += dt                  #time increase [s]
         ind += 1                 #index increase
-        electron1.updDraw()
         updateTimeClock(windObj1, relclockObj1, t)
-        print electron1.p
+        #print electron1.p
 
 if __name__ == "__main__":
     main()

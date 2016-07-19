@@ -199,7 +199,7 @@ class BField(object):
         
         return [Bx, By, Bz]
     
-    def drawBlines(self, windObj, po, linedist):
+    def drawBlines(self, windObj, po, pboundary):
         """Draw B field lines starting at po and ending at ####."""
         px = po[0]; py = po[1]; pz = po[2]
 #########Need better boundary conditions, but not sure how to define at this time

@@ -1,9 +1,3 @@
-# Tom Gade
-# Electron in a Magnetic Bottle
-# v4.1.2 11Jul16
-# Works on Python 2.7 ONLY (as of now), and VPython 6
-# Written as part of a Senior research project at the Citadel, 2008-2009
-
 from __future__ import division
 
 import os, sys, inspect
@@ -20,48 +14,54 @@ from VPyDraw import *
 def main():
     ind = 0                            #Index (Calculation Counter)
     t = 0                              #Initial time [s]
-    BList = []
     dt = 5*10**-9
     
-    e1center = (5, 0.25, 5)
-    e1vel = (-1000, 1000, 1000)
+    e1center = [-4.75,0,0]
+    e1vel = [1000,1000,1000]
+    e1center = [4.75,0,0]
+    e1vel = [-1000,-1000,-1000]
+    wccenter = [0,0,0]
+    loopaxis = [1,0,0]
     
     # Draw some things
     windObj1 = drawWindow(1920, 1080, e1center)
     relclockObj1 = drawTimeClock(windObj1, t)
     
-    wireCoils = WireCoilPair(windObj1, (5, 5, 5), (0, 1, 0), 1, 1, 5, 5)
+    wireCoils = WireCoilPair(windObj1, wccenter, loopaxis, 1, 1, 5, 5)
     wireCoils.initDraw()
-    BList.append(wireCoils)
     
-    electron1 = Particle(windObj1, -1.76*10**11, 1, e1center, e1vel)
+    electron1 = Electron(windObj1, e1center, e1vel)
     electron1.initDraw(10, 50)
     
-    #electron2 = Particle(windObj1, -1.76*10**11, 1, (4.75, 0, 0), (-1000, -1000, -1000))
-    #electron2.initDraw(10, 50)
+    electron2 = Electron(windObj1, e2center, e2vel)
+    electron2.initDraw(10, 50)
     #electron2.color=color.yellow
     
-    B = BField(windObj1, BList)
-    #Use rotateVector to rotate to appropriate start point
-    #B.drawBlines(windObj1, (-5, 0, -3.5), 0.1)
-    #B.drawBlines(windObj1, (-5, -3.5, 0), 0.1)
-    #B.drawBlines(windObj1, (-5, 0, 3.5), 0.1)
-    #B.drawBlines(windObj1, (-5, 3.5, 0), 0.1)
+    B = BField(windObj1)
+    B.BObjList.append(wireCoils)
+    B.BObjList.append(electron1)
+    B.BObjList.append(electron2)
+    #Need to update drawBlines for appropriate boundary conditions, then uncomment below
+    #for i in [[-5,0,-3.5],[-5,-3.5,0],[-5,0,3.5],[-5,3.5,0]]:
+        #j = rotateVector(i,wireCoils.axis_theta,wireCoils.axis_phi)
+        #j += wireCoils.C
+        #B.drawBlines(windObj1, j, 0.1)
     
-    #while (-10 <= x <= 10) and (-10 <= y <= 10) and (-10 <= z <= 10):
-    while t < 0.001:
+    while ((-10 + wccenter[0]) <= electron1.p[0] <= (10 + wccenter[0])) and ((-10 + 
+            wccenter[1]) <= electron1.p[1] <= (10 + wccenter[1])) and ((-10 + 
+            wccenter[2]) <= electron1.p[2] <= (10 + wccenter[2])):
         FPSrate(10000)
-        Bx, By, Bz = B.totalBatP((electron1.px, electron1.py, electron1.pz))
-        #Bx, By, Bz = wireCoils.calcBatP((electron1.px, electron1.py, electron1.pz))
-        #Bxs, Bys, Bzs = wireCoils.calcBatP((electron2.px, electron2.py, electron2.pz))
+        B1array = B.totalBatP(electron1.p)
+        B2array = B.totalBatP(electron2.p)
+        electron1.updP(B1array, dt)
+        electron2.updP(B2array, dt)
+        electron1.updDraw()
+        electron2.updDraw()
         
-        electron1.updP(Bx, By, Bz, dt)
-        #electron2.updP(Bxs, Bys, Bzs, dt)
         t += dt                  #time increase [s]
         ind += 1                 #index increase
-        electron1.updDraw()
-        #electron2.updDraw()
         updateTimeClock(windObj1, relclockObj1, t)
+        #print electron1.p
 
 if __name__ == "__main__":
     main()
