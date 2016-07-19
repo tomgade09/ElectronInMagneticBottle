@@ -5,6 +5,8 @@ from scipy import integrate
 from math import *
 import numpy as np
 
+__version__ = "4.1.4" #18 Jul 16
+
 class Particle(object):
     """Define a particle to be placed in the specified magnetic field.
     
@@ -103,6 +105,18 @@ class WireCoilPair(object):
         self.N = N; self.I = I; self.R = R; self.d = d
         self.wind = windObj
         self.cst = float(self.N * self.I * 10**(-5))
+        if self.axis_theta == 0 and self.axis_phi == 0: #Z Axis calculate center points
+            self.rtLoopCnt = [self.C[0], self.C[1], self.C[2] + self.d]
+            self.lfLoopCnt = [self.C[0], self.C[1], self.C[2] - self.d]
+        else: #All other cases calculate center points for loops
+            self.rtLoopCnt = sphericalToCartesian(self.d, self.axis_theta, self.axis_phi)
+            if self.axis_phi > pi:
+                self.lfLoopCnt = sphericalToCartesian(self.d, pi-self.axis_theta,
+                    self.axis_phi-pi)
+            else:
+                self.lfLoopCnt = sphericalToCartesian(self.d, pi-self.axis_theta,
+                    self.axis_phi+pi)
+            self.rtLoopCnt += self.C; self.lfLoopCnt += self.C
         
         if self.axis[0] != 0 and self.axis[1] == 0 and self.axis[2] == 0:
             #X axis - no rotation, don't run code that's not necessary
@@ -120,17 +134,7 @@ class WireCoilPair(object):
 
     def initDraw(self):
         """Draw the pair of Wire Coils."""
-        if self.axis_theta == 0 and self.axis_phi == 0: #Z Axis calculate center points
-            cntrt = [self.C[0], self.C[1], self.C[2] + self.d]
-            cntlf = [self.C[0], self.C[1], self.C[2] - self.d]
-        else: #All other cases calculate center points for loops
-            cntrt = sphericalToCartesian(self.d, self.axis_theta, self.axis_phi)
-            if self.axis_phi > pi:
-                cntlf = sphericalToCartesian(self.d, pi-self.axis_theta, self.axis_phi-pi)
-            else:
-                cntlf = sphericalToCartesian(self.d, pi-self.axis_theta, self.axis_phi+pi)
-            cntrt += self.C; cntlf += self.C
-        drawWireCoilPair(self.wind, self.C, self.axis, cntlf, cntrt, self.R)
+        drawWireCoilPair(self.wind, self.C, self.axis, self.lfLoopCnt, rtLoopCnt, self.R)
         
     def calcBatP(self, p):
         """Calculate the B field as a result of the wire coils at a position P."""

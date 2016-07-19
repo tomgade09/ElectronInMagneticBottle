@@ -1,9 +1,3 @@
-# Tom Gade
-# Electron in a Magnetic Bottle
-# v4.1.2 11Jul16
-# Works on Python 2.7 ONLY (as of now), and VPython 6
-# Written as part of a Senior research project at the Citadel, 2008-2009
-
 from __future__ import division
 
 import os, sys, inspect
@@ -40,11 +34,11 @@ def main():
     B = BField(windObj1)
     B.BObjList.append(wireCoils)
     B.BObjList.append(electron1)
-    #Use rotateVector to rotate to appropriate start point
-    #B.drawBlines(windObj1, (-5, 0, -3.5), 0.1)
-    #B.drawBlines(windObj1, (-5, -3.5, 0), 0.1)
-    #B.drawBlines(windObj1, (-5, 0, 3.5), 0.1)
-    #B.drawBlines(windObj1, (-5, 3.5, 0), 0.1)
+    #Need to update drawBlines for appropriate boundary conditions, then uncomment below
+    #for i in [[-5,0,-3.5],[-5,-3.5,0],[-5,0,3.5],[-5,3.5,0]]:
+        #j = rotateVector(i,wireCoils.axis_theta,wireCoils.axis_phi)
+        #j += wireCoils.C
+        #B.drawBlines(windObj1, j, 0.1)
     
     while ((-10 + wccenter[0]) <= electron1.p[0] <= (10 + wccenter[0])) and ((-10 + 
             wccenter[1]) <= electron1.p[1] <= (10 + wccenter[1])) and ((-10 + 
