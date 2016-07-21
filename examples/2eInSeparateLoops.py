@@ -50,7 +50,7 @@ def main():
     #####Below needs a test
     for i in [[-5,0,-3.5],[-5,-3.5,0],[-5,0,3.5],[-5,3.5,0]]:
         j = rotateVector(i,wireCoils.axis_theta,wireCoils.axis_phi)
-        j += wireCoils.C
+        j += wireCoils.Cpair
         k = sphericalToCartesian(2*wireCoils.d,wireCoils.axis_theta,wireCoils.axis_phi)
         B.drawBlines(windObj1, j, pupbound=k, multlng=10000)
     

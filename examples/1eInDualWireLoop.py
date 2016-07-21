@@ -33,13 +33,11 @@ def main():
     
     B = BField(windObj1)
     B.BObjList.append(wireCoils)
-    B.BObjList.append(electron1)
+    #B.BObjList.append(electron1)
     #####Below needs a test
     for i in [[-5,0,-3.5],[-5,-3.5,0],[-5,0,3.5],[-5,3.5,0]]:
-        j = rotateVector(i,wireCoils.axis_theta,wireCoils.axis_phi)
-        j += wireCoils.C
-        k = sphericalToCartesian(2*wireCoils.d,wireCoils.axis_theta,wireCoils.axis_phi)
-        B.drawBlines(windObj1, j, pupbound=k, multlng=10000)
+        j = rotateVector(i,wireCoils.axiscf_theta,wireCoils.axiscf_phi) + wireCoils.Cpair
+        B.drawBlines(windObj1, j, pupbound=[5,None,None], multlng=10000)
     
     while ((-10 + wccenter[0]) <= electron1.p[0] <= (10 + wccenter[0])) and ((-10 + 
             wccenter[1]) <= electron1.p[1] <= (10 + wccenter[1])) and ((-10 + 
@@ -49,13 +47,13 @@ def main():
         electron1.updP(Barray, dt)
         electron1.updDraw()
 
-        t += dt                  #time increase [s]
-        ind += 1                 #index increase
+        t += dt
+        ind += 1
         updateTimeClock(windObj1, relclockObj1, t)
         #print electron1.p
     
     while True:
-        FPSrate(10000)
+        FPSrate(30)
 
 if __name__ == "__main__":
     main()

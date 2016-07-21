@@ -40,11 +40,12 @@ def main():
     B.BObjList.append(wireCoils)
     B.BObjList.append(electron1)
     B.BObjList.append(electron2)
-    #Need to update drawBlines for appropriate boundary conditions, then uncomment below
-    #for i in [[-5,0,-3.5],[-5,-3.5,0],[-5,0,3.5],[-5,3.5,0]]:
-        #j = rotateVector(i,wireCoils.axis_theta,wireCoils.axis_phi)
-        #j += wireCoils.C
-        #B.drawBlines(windObj1, j, 0.1)
+    #Needs a test
+    for i in [[-5,0,-3.5],[-5,-3.5,0],[-5,0,3.5],[-5,3.5,0]]:
+        j = rotateVector(i,wireCoils.axis_theta,wireCoils.axis_phi)
+        j += wireCoils.Cpair
+        k = sphericalToCartesian(2*wireCoils.d,wireCoils.axis_theta,wireCoils.axis_phi)
+        B.drawBlines(windObj1, j, pupbound=k, multlng=10000)
     
     while ((-10 + wccenter[0]) <= electron1.p[0] <= (10 + wccenter[0])) and ((-10 + 
             wccenter[1]) <= electron1.p[1] <= (10 + wccenter[1])) and ((-10 + 

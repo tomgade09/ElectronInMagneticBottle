@@ -33,7 +33,7 @@ class Particle(object):
 
     def initDraw(self, intrvl, traillng, Dcolor=color.green):
         """Draw a point object representing the particle in the object specified by self.wind.  intrvl represents how often to 'draw' a point.  traillng represents how long of a 'trail' to leave behind the current position of the particle."""
-        if self.pic != None:
+        if self.pic is not None:
             print "Pic has already been initialized.  Use updDraw to change the position."
             return
         self.pic = drawParticlePic(self.wind, self.p, intrvl, traillng, Dcolor)
@@ -41,7 +41,7 @@ class Particle(object):
         
     def updDraw(self):
         """Update the location of the point object drawn with initDraw.  Obviously, it can't be updated if it hasn't been initialized.  Use the initDraw function first."""        
-        if self.pic == None:
+        if self.pic is None:
             print "Pic has not been initialized.  Use initDraw to create a picture of the particle first."
             return
         updateParticlePic(self.wind, self.pic, self.p)
@@ -49,14 +49,12 @@ class Particle(object):
     def calcBatP(self, pB):
         """Calculate B at a point pB due to this particle."""
         pB = pB[:] #If particle.p is passed in, need to change pB to a list vs a pointer
-        pB += np.array(self.p)
+        pB -= np.array(self.p)
         if abs(pB[0]) <= 10e-15 and abs(pB[1]) <= 10e-15 and abs(pB[2]) <=10e-15:
             return 0, 0, 0
-        plen = sqrt(pB[0]**2 + pB[1]**2 + pB[2]**2)
-        c = 10e-5 * self.q / plen**3 #Should be in cm?  Need to get units right.
+        c = 10e-5 * self.q / sqrt(pB[0]**2 + pB[1]**2 + pB[2]**2)**3
         b = np.cross(self.v, pB)
         b = np.array(b) * c
-        
         return b[0], b[1], b[2]
     
     def __updV(self, b, dt):
@@ -205,33 +203,34 @@ class BField(object):
         
         return [Bx, By, Bz]
     #####Need to test this code out below
-    def drawBlines(self, windObj, p, pupbound=None, plobound=None, numiter=None, 
-        linelength=None, multlng=None):
+    def drawBlines(self, windObj, p, pupbound=[None,None,None],
+        plobound=[None,None,None], numiter=None, linelength=None, multlng=None):
         """Draw B field lines starting at po and ending at ####."""
         loopind = 0
         BoundBool = True
         while BoundBool:
             for i in [pupbound, plobound]: #Need to account for lower bound p > lobound
-                if i[0] != None:
+                if i[0] is not None:
                     BoundBool = BoundBool and p[0] <= i[0]
-                if i[1] != None:
+                if i[1] is not None:
                     BoundBool = BoundBool and p[1] <= i[1]
-                if i[2] != None:
+                if i[2] is not None:
                     BoundBool = BoundBool and p[2] <= i[2]
-            if numiter != None:
+            if numiter is not None:
                 loopind += 1
                 BoundBool = BoundBool and loopind < numiter
             
             bx, by, bz = self.totalBatP(p)
             
-            if linelength != None:
+            if linelength is not None:
                 Blen, Bth, Bphi = cartesianToSpherical([bx,by,bz])
                 bx, by, bz = sphericalToCartesian(linelength, Bth, Bphi)
-            elif multlng != None:
+            elif multlng is not None:
                 bx *= multlng; by *= multlng; bz *= multlng
             
             drawLine(windObj, p, [bx,by,bz])
             p[0] += bx; p[1] += by; p[2] += bz
+            
     #####Test this code out ^^^^^
 def cartesianToSpherical(a):
     """Convert cartesian coords to spherical."""
