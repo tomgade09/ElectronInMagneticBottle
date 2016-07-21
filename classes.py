@@ -117,7 +117,7 @@ class WireCoilPair(object):
             self.axis_theta = self.axis_phi = 0
         else:
             self.axis_rho, self.axis_theta, self.axis_phi = cartesianToSpherical(
-                self.axis[0], self.axis[1], self.axis[2])
+                self.axis)
             self.axiscf_theta = self.axis_theta - (pi / 2)
             self.axiscf_phi = self.axis_phi
 
@@ -181,7 +181,7 @@ class WireCoilPair(object):
         if self.axiscf_theta == 0 and self.axiscf_phi == 0:
             return bx, by, bz
             
-        bxprime, byprime, bzprime = rotateVector(bx, by, bz, self.axiscf_theta, 
+        bxprime, byprime, bzprime = rotateVector([bx,by,bz], self.axiscf_theta, 
             self.axiscf_phi)
         
         return bxprime, byprime, bzprime
