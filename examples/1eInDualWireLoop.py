@@ -4,6 +4,7 @@ import os, sys, inspect
 a = os.path.dirname(os.path.abspath(inspect.getsourcefile(lambda:0)))
 sys.path.append(a + '/../')
 sys.path.append(a + '/../vis/')
+os.chdir(a)
 
 from classes import *
 # Only use one of these at a time to avoid namespace conflicts
@@ -11,15 +12,20 @@ from VPyDraw import *
 #from pygletDraw import *
 #from OpenGLDraw import *
 
+#import csv
+
 def main():
     ind = 0                            #Index (Calculation Counter)
     t = 0                              #Initial time [s]
-    dt = 5*10**-9
+    dt = 5*10**-8
     
     e1center = [-4.75,0,0]
     e1vel = [1000,1000,1000]
     wccenter = [0,0,0]
     loopaxis = [1,0,0]
+    #pos = []
+    
+    #resultfile = open('iter.csv','wb')
     
     # Draw some things
     windObj1 = drawWindow(1920, 1080, e1center)
@@ -33,7 +39,7 @@ def main():
     
     B = BField(windObj1)
     B.BObjList.append(wireCoils)
-    #B.BObjList.append(electron1)
+    #B.BObjList.append(electron1) #Messes with mag field lines.  Don't need for now.
     #####Below needs a test
     for i in [[-5,0,-3.5],[-5,-3.5,0],[-5,0,3.5],[-5,3.5,0]]:
         j = rotateVector(i,wireCoils.axiscf_theta,wireCoils.axiscf_phi) + wireCoils.Cpair
@@ -50,7 +56,10 @@ def main():
         t += dt
         ind += 1
         updateTimeClock(windObj1, relclockObj1, t)
-        #print electron1.p
+        #pos.append(electron1.p)
+    
+    #wr = csv.writer(resultfile)
+    #wr.writerows(pos)
     
     while True:
         FPSrate(30)

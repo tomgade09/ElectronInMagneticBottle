@@ -5,7 +5,7 @@ from scipy import integrate
 from math import *
 import numpy as np
 
-__version__ = "4.1.5" #18 Jul 16
+__version__ = "4.2.0" #21 Jul 16
 
 class Particle(object):
     """Define a particle to be placed in the specified magnetic field.
@@ -181,10 +181,7 @@ class WireCoilPair(object):
         if self.axiscf_theta == 0 and self.axiscf_phi == 0:
             return bx, by, bz
             
-        bxprime, byprime, bzprime = rotateVector([bx,by,bz], self.axiscf_theta, 
-            self.axiscf_phi)
-        
-        return bxprime, byprime, bzprime
+        return rotateVector([bx,by,bz], self.axiscf_theta, self.axiscf_phi)
 
 class BField(object):
     """Define a B Field object containing the elements in BObjList."""
@@ -202,7 +199,7 @@ class BField(object):
             Bx += bx; By += by; Bz += bz
         
         return [Bx, By, Bz]
-    #####Need to test this code out below
+    
     def drawBlines(self, windObj, p, pupbound=[None,None,None],
         plobound=[None,None,None], numiter=None, linelength=None, multlng=None):
         """Draw B field lines starting at po and ending at ####."""
@@ -231,14 +228,11 @@ class BField(object):
             drawLine(windObj, p, [bx,by,bz])
             p[0] += bx; p[1] += by; p[2] += bz
             
-    #####Test this code out ^^^^^
 def cartesianToSpherical(a):
     """Convert cartesian coords to spherical."""
     rho = sqrt(a[0]**2 + a[1]**2 + a[2]**2)
     if a[0] == 0 and a[1] == 0 and a[2] != 0: #Z axis case
-        theta = phi = 0
-        return rho, theta, phi
-    
+        return rho, 0, 0
     theta = acos(a[2] / rho)
     phi = atan2(a[1], a[0])
     
@@ -247,8 +241,7 @@ def cartesianToSpherical(a):
 def sphericalToCartesian(rho, theta, phi):
     """Convert spherical coords to cartesian."""
     if theta == 0: #Z axis case
-        x = y = 0
-        z = rho
+        return 0, 0, rho
     else:
         x = rho * sin(theta) * cos(phi)
         y = rho * sin(theta) * sin(phi)
@@ -264,7 +257,17 @@ def rotateVector(v, rot_theta, rot_phi):
     elif rot_theta == rot_phi == 0: #X axis case
         return v
     tmp_rho, tmp_theta, tmp_phi = cartesianToSpherical(v)
-    vprm = sphericalToCartesian(tmp_rho, tmp_theta + rot_theta, tmp_phi +
-        rot_phi)
     
-    return vprm
+    return sphericalToCartesian(tmp_rho, tmp_theta + rot_theta, tmp_phi + rot_phi)
+    
+def foRKvCrossB(BObj,PartObj,h): #Highly experimental!  Not even sure if I implemented the algorithm right.
+    k1 = PartObj.eom * np.cross(PartObj.v,BObj.totalBatP(PartObj.p)) * h
+    k2 = PartObj.eom * np.cross(PartObj.v + k1 / 2, BObj.totalBatP(PartObj.p +
+        np.array(PartObj.v) * h / 2)) * h
+    k3 = PartObj.eom * np.cross(PartObj.v + k2 / 2, BObj.totalBatP(PartObj.p +
+        np.array(PartObj.v) * h / 2)) * h
+    k4 = PartObj.eom * np.cross(PartObj.v + k3, BObj.totalBatP(PartObj.p +
+        np.array(PartObj.v) * h)) * h
+    
+    PartObj.v += (k1 + 2 * (k2 + k3) + k4) / 6
+    PartObj.p += PartObj.v * h
