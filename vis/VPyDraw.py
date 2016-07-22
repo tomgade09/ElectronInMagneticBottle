@@ -67,6 +67,9 @@ def drawWireCoilPair(windObj, C, norm, cntlf, cntrt, R):
 def FPSrate(fps):
     rate(fps)
     
+def displayFlip(): #Placeholder
+    return
+    
 #Needs work
 def keyInput(evt):
     #global key

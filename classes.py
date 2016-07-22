@@ -40,7 +40,7 @@ class Particle(object):
         return self.pic
         
     def updDraw(self):
-        """Update the location of the point object drawn with initDraw.  Obviously, it can't be updated if it hasn't been initialized.  Use the initDraw function first."""        
+        """Update the location of the point object drawn with initDraw.  Obviously, it can't be updated if it hasn't been initialized.  Use the initDraw function first."""
         if self.pic is None:
             print "Pic has not been initialized.  Use initDraw to create a picture of the particle first."
             return
@@ -260,7 +260,7 @@ def rotateVector(v, rot_theta, rot_phi):
     
     return sphericalToCartesian(tmp_rho, tmp_theta + rot_theta, tmp_phi + rot_phi)
     
-def foRKvCrossB(BObj,PartObj,h): #Highly experimental!  Not even sure if I implemented the algorithm right.
+def foRKvCrossB(BObj,PartObj,h): #Highly experimental!  Not sure if I implemented the algorithm right.
     k1 = PartObj.eom * np.cross(PartObj.v,BObj.totalBatP(PartObj.p)) * h
     k2 = PartObj.eom * np.cross(PartObj.v + k1 / 2, BObj.totalBatP(PartObj.p +
         np.array(PartObj.v) * h / 2)) * h

@@ -9,6 +9,7 @@ os.chdir(a)
 from classes import *
 # Only use one of these at a time to avoid namespace conflicts
 from VPyDraw import *
+#from pygletDraw import *
 #from OpenGLDraw import *
 
 #import csv
@@ -23,8 +24,7 @@ def main():
     wccenter = [0,0,0]
     loopaxis = [1,0,0]
     #pos = []
-    
-    #resultfile = open('iter.csv','wb')
+    #resultfile = open('FORK.csv','wb')
     
     # Draw some things
     windObj1 = drawWindow(1920, 1080, e1center)
@@ -34,28 +34,28 @@ def main():
     wireCoils.initDraw()
     
     electron1 = Electron(windObj1, e1center, e1vel)
-    electron1.initDraw(10, 50)
+    electron1.initDraw(1, 50)
     
     B = BField(windObj1)
     B.BObjList.append(wireCoils)
-    #B.BObjList.append(electron1) #Messes with mag field lines.  Don't need for now.
+    #B.BObjList.append(electron1)
     #####Below needs a test
     for i in [[-5,0,-3.5],[-5,-3.5,0],[-5,0,3.5],[-5,3.5,0]]:
         j = rotateVector(i,wireCoils.axiscf_theta,wireCoils.axiscf_phi) + wireCoils.Cpair
         B.drawBlines(windObj1, j, pupbound=[5,None,None], multlng=10000)
     
-    while ((-10 + wccenter[0]) <= electron1.p[0] <= (10 + wccenter[0])) and ((-10 + 
-            wccenter[1]) <= electron1.p[1] <= (10 + wccenter[1])) and ((-10 + 
-            wccenter[2]) <= electron1.p[2] <= (10 + wccenter[2])):      
+    while ind < 1000: #Need to specify a number of iterations or loop would never end
+    #while ((-10 + wccenter[0]) <= electron1.p[0] <= (10 + wccenter[0])) and ((-10 + 
+            #wccenter[1]) <= electron1.p[1] <= (10 + wccenter[1])) and ((-10 + 
+            #wccenter[2]) <= electron1.p[2] <= (10 + wccenter[2])):      
         FPSrate(10000)
-        Barray = B.totalBatP(electron1.p)
-        electron1.updP(Barray, dt)
+        
+        foRKvCrossB(B,electron1,dt)
         electron1.updDraw()
-
+        #pos.append(electron1.p)
         t += dt
         ind += 1
         updateTimeClock(windObj1, relclockObj1, t)
-        #pos.append(electron1.p)
     
     #wr = csv.writer(resultfile)
     #wr.writerows(pos)
