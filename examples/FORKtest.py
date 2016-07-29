@@ -12,20 +12,16 @@ from VPyDraw import *
 #from pygletDraw import *
 #from OpenGLDraw import *
 
-#import csv
-
 def main():
     ind = 0                            #Index (Calculation Counter)
     t = 0                              #Initial time [s]
-    dt = 5*10**-8
+    dt = 5*10**-9
     
     e1center = [-4.75,0,0]
     e1vel = [1000,1000,1000]
     wccenter = [0,0,0]
     loopaxis = [1,0,0]
-    #pos = []
-    #resultfile = open('FORK.csv','wb')
-    
+
     # Draw some things
     windObj1 = drawWindow(1920, 1080, e1center)
     relclockObj1 = drawTimeClock(windObj1, [-6.5,0,0], t)
@@ -34,7 +30,7 @@ def main():
     wireCoils.initDraw()
     
     electron1 = Electron(windObj1, e1center, e1vel)
-    electron1.initDraw(1, 50)
+    electron1.initDraw(10, 50)
     
     B = BField(windObj1)
     B.BObjList.append(wireCoils)
@@ -50,15 +46,11 @@ def main():
             #wccenter[2]) <= electron1.p[2] <= (10 + wccenter[2])):      
         FPSrate(10000)
         
-        foRKvCrossB(B,electron1,dt)
+        electron1.foRKvCrossB(B,dt)
         electron1.updDraw()
-        #pos.append(electron1.p)
         t += dt
         ind += 1
         updateTimeClock(windObj1, relclockObj1, t)
-    
-    #wr = csv.writer(resultfile)
-    #wr.writerows(pos)
     
     while True:
         FPSrate(30)

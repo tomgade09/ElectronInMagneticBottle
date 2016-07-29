@@ -46,7 +46,8 @@ def updateTimeClock(windObj, relclockObj, relt):
     windObj.select()
     relclockObj.text = 't = ' + str(relt) + ' s'
     
-def drawLine(windObj, p, laxis, headwd=0.005, headln=0.001, shaftwd=0.01, col=color.red):
+def drawLine(windObj, p, laxis, headwd=0.005, headln=0.001, shaftwd=0.01,
+    col=color.red):
     px = p[0]
     py = p[1]
     pz = p[2]
@@ -54,8 +55,8 @@ def drawLine(windObj, p, laxis, headwd=0.005, headln=0.001, shaftwd=0.01, col=co
     axis_y = laxis[1]
     axis_z = laxis[2]
     windObj.select()
-    arrow(pos=(px, py, pz), axis=(axis_x, axis_y, axis_z), color=col, headwidth=headwd,
-        headlength=headln, shaftwidth=shaftwd)
+    arrow(pos=(px, py, pz), axis=(axis_x, axis_y, axis_z), color=col, 
+        headwidth=headwd, headlength=headln, shaftwidth=shaftwd)
         
 def drawWireCoilPair(windObj, C, norm, cntlf, cntrt, R):
     windObj.select()

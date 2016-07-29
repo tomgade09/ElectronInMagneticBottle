@@ -1,11 +1,14 @@
 from __future__ import division
 
+# Import visual library.  Only use one of these at a time to avoid namespace conflicts.
 from VPyDraw import *
+#from OpenGLDraw import *
+
 from scipy import integrate
 from math import *
 import numpy as np
-
-__version__ = "4.2.0" #21 Jul 16
+from vectortools import *
+import version
 
 class Particle(object):
     """Define a particle to be placed in the specified magnetic field.
@@ -59,8 +62,8 @@ class Particle(object):
     
     def __updV(self, b, dt):
         """Calculate the new velocity of the particle based on the specified B field."""
-        a = np.cross(self.v, b) * self.eom * dt
-        self.v += a
+        dv = np.cross(self.v, b) * self.eom * dt
+        self.v += dv
         
     def updP(self, b, dt):
         """Calculate the new position based on the particle's velocity."""
@@ -68,6 +71,18 @@ class Particle(object):
         #self.p += self.v * dt #For some reason, doesn't work, but would be quicker.
         for i in range(3):
             self.p[i] += self.v[i] * dt
+    
+    def foRKvCrossB(self, BFieldObj, h): #Highly experimental!  Not sure if algorithm is implemented right.
+        k1 = self.eom * np.cross(self.v,BFieldObj.totalBatP(self.p)) * h
+        k2 = self.eom * np.cross(self.v + k1 / 2, BFieldObj.totalBatP(self.p +
+            np.array(self.v) * h / 2)) * h
+        k3 = self.eom * np.cross(self.v + k2 / 2, BFieldObj.totalBatP(self.p +
+            np.array(self.v) * h / 2)) * h
+        k4 = self.eom * np.cross(self.v + k3, BFieldObj.totalBatP(self.p +
+            np.array(self.v) * h)) * h
+    
+        self.v += (k1 + 2 * (k2 + k3) + k4) / 6
+        self.p += self.v * h
             
 class Electron(Particle):
     """Define an electron as a specific type of 'Particle'"""
@@ -143,8 +158,9 @@ class WireCoilPair(object):
         """Calculate the B field as a result of the wire coils at a position P."""
         pcnt = [p[0] - self.Cpair[0], p[1] - self.Cpair[1], p[2] - self.Cpair[2]]
         ppr = rotateVector(pcnt, -self.axiscf_theta, -self.axiscf_phi)
-########Add X, Z Axis conditions
-        
+        #ToDo Add X, Z Axis conditions
+        #ToDo Write functions in C for faster calculations
+        #ToDo Separate loop pair and define loops one-by-one
         #Equations to Integrate
         lfdBx = lambda a: self.cst*(-self.R*ppr[2]*sin(a) - self.R*ppr[1]*cos(a) + 
             self.R**2) / (((ppr[0] + self.d)**2 + (ppr[1] - self.R*cos(a))**2 + (ppr[2] - 
@@ -190,6 +206,7 @@ class BField(object):
         self.windObj = windObj
         self.BObjList = BObjList[:]
         self.name = name
+        #ToDo Define Particle list separate from BObjList
         
     def totalBatP(self, p):
         """Calculate total B at p due to all objects in BObjList.  Calculates them one at a time and adds them together."""
@@ -206,7 +223,8 @@ class BField(object):
         loopind = 0
         BoundBool = True
         while BoundBool:
-            for i in [pupbound, plobound]: #Need to account for lower bound p > lobound
+            for i in [pupbound, plobound]:
+                #ToDo Write code to check lower bound - maybe negative both sides
                 if i[0] is not None:
                     BoundBool = BoundBool and p[0] <= i[0]
                 if i[1] is not None:
@@ -227,47 +245,3 @@ class BField(object):
             
             drawLine(windObj, p, [bx,by,bz])
             p[0] += bx; p[1] += by; p[2] += bz
-            
-def cartesianToSpherical(a):
-    """Convert cartesian coords to spherical."""
-    rho = sqrt(a[0]**2 + a[1]**2 + a[2]**2)
-    if a[0] == 0 and a[1] == 0 and a[2] != 0: #Z axis case
-        return rho, 0, 0
-    theta = acos(a[2] / rho)
-    phi = atan2(a[1], a[0])
-    
-    return rho, theta, phi
-
-def sphericalToCartesian(rho, theta, phi):
-    """Convert spherical coords to cartesian."""
-    if theta == 0: #Z axis case
-        return 0, 0, rho
-    else:
-        x = rho * sin(theta) * cos(phi)
-        y = rho * sin(theta) * sin(phi)
-        z = rho * cos(theta)
-    
-    return [x, y, z]
-    
-def rotateVector(v, rot_theta, rot_phi):
-    """Rotate a vector, v by rot_theta and rot_phi.  You can guess which corresponds to theta and which corresponds to phi."""
-    if rot_theta == -pi / 2: #Z axis case
-        xprm = - v[2]; yprm = v[1]; zprm = v[0]
-        return xprm, yprm, zprm
-    elif rot_theta == rot_phi == 0: #X axis case
-        return v
-    tmp_rho, tmp_theta, tmp_phi = cartesianToSpherical(v)
-    
-    return sphericalToCartesian(tmp_rho, tmp_theta + rot_theta, tmp_phi + rot_phi)
-    
-def foRKvCrossB(BObj,PartObj,h): #Highly experimental!  Not sure if I implemented the algorithm right.
-    k1 = PartObj.eom * np.cross(PartObj.v,BObj.totalBatP(PartObj.p)) * h
-    k2 = PartObj.eom * np.cross(PartObj.v + k1 / 2, BObj.totalBatP(PartObj.p +
-        np.array(PartObj.v) * h / 2)) * h
-    k3 = PartObj.eom * np.cross(PartObj.v + k2 / 2, BObj.totalBatP(PartObj.p +
-        np.array(PartObj.v) * h / 2)) * h
-    k4 = PartObj.eom * np.cross(PartObj.v + k3, BObj.totalBatP(PartObj.p +
-        np.array(PartObj.v) * h)) * h
-    
-    PartObj.v += (k1 + 2 * (k2 + k3) + k4) / 6
-    PartObj.p += PartObj.v * h
