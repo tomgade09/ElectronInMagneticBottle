@@ -1,8 +1,8 @@
 from __future__ import division
 
 # Import visual library.  Only use one of these at a time to avoid namespace conflicts.
-from VPyDraw import *
-#from OpenGLDraw import *
+#from VPyDraw import *
+from OpenGLDraw import *
 
 from scipy import integrate
 from math import *
@@ -34,7 +34,7 @@ class Particle(object):
         self.eom = self.q / self.mass
         self.pic = None
 
-    def initDraw(self, intrvl, traillng, Dcolor=color.green):
+    def initDraw(self, intrvl, traillng, Dcolor=(0,1,0)):
         """Draw a point object representing the particle in the object specified by self.wind.  intrvl represents how often to 'draw' a point.  traillng represents how long of a 'trail' to leave behind the current position of the particle."""
         if self.pic is not None:
             print "Pic has already been initialized.  Use updDraw to change the position."

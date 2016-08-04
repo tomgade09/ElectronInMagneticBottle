@@ -28,6 +28,7 @@ class sphere(object):
         
     def draw(self):
         for p in self.trail[::self.interval]:
+            glMatrixMode(GL_MODELVIEW)
             glPushMatrix()
             glTranslatef(p[0], p[1], p[2])
             drawSphere(self.radius, self.color)
@@ -41,10 +42,11 @@ class sphere(object):
         self.trail.append((pos[0],pos[1],pos[2])) #ensure appended object is a tuple
 
 ###Ring Class and Draw code
-def Torus(numc, numt, radius=1, thickness=0.01):
+def Torus(numc, numt, radius=1, thickness=0.01,color=(0.75,0.75,0.75)):
     twopi = 2 * math.pi;
     for i in range(0, numc):
         glBegin(GL_QUAD_STRIP)
+        glColor3f(color[0], color[1], color[2]);
         for j in range(0, numt+1):
             for k in range(1,-1, -1):
                 s = (i + k) % numc + 0.5
@@ -57,18 +59,19 @@ def Torus(numc, numt, radius=1, thickness=0.01):
         
 class ring(object):
     """Create a ring object."""
-    def __init__(self, pos=(0,0,0), axis=(1,0,0), radius=1, thickness=1):
+    def __init__(self, pos=(0,0,0), axis=(1,0,0), radius=1, thickness=0.01):
         self.pos = pos
         self.axis = axis
         self.radius = radius
         self.thickness = thickness
         
     def draw(self):
+        glMatrixMode(GL_MODELVIEW)
         glPushMatrix()
         xyz = np.array([0,0,-1])
         c = np.cross(xyz,self.axis)
-        glRotatef(90, c[0], c[1], c[2]) #Something wrong with loop rotation - try diff values
         glTranslatef(self.pos[0], self.pos[1], self.pos[2])
+        glRotatef(90, c[0], c[1], c[2])
         Torus(5, 30, self.radius, self.thickness)
         glPopMatrix()
 
@@ -86,38 +89,38 @@ def Line(verts): #Original code by Danny Orban.
 #def drawWindow(wd, ht, cent, axistype="points"): Need to decide how I'm drawing window - GLUT or PyGame?
     #Could I sneak the code in for lighting, depth, perspective, etc into here?
 
-def drawParticlePic(windObj, po, intrvl, traillng, col):
-    #somehow select the window (don't know how to specify in OpenGL)
-    particle = sphere(pos=po, interval=intrvl, retain=traillng, color=col)
-    particle.draw()
+#def drawParticlePic(windObj, po, intrvl, traillng, col):
+    ##somehow select the window (don't know how to specify in OpenGL)
+    #particle = sphere(pos=po, interval=intrvl, retain=traillng, color=col)
+    #particle.draw()
     
-    return particle
+    #return particle
 
-def updateParticlePic(windObj, partObj, p):
-    #somehow select the window (don't know how to specify in OpenGL)
-    partObj.setPos(p)
-    partObj.draw
+#def updateParticlePic(windObj, partObj, p):
+    ##somehow select the window (don't know how to specify in OpenGL)
+    #partObj.setPos(p)
+    #partObj.draw
 
 #def drawTimeClock(windObj, po, to):
 
 #def updateTimeClock(windObj, relclockObj, relt):
 
-def drawLine(windObj, p, laxis, headwd=0.005, headln=0.001, shaftwd=0.01,
-    col=[1,0,0]):
-    #somehow select the window (don't know how to specify in OpenGL)
-    #set color to col
-    vert = []
-    vert.append(p)
-    vert.append((p[0] + laxis[0], p[1] + laxis[1], p[2] + laxis[2]))
-    Line(vert)
+#def drawLine(windObj, p, laxis, headwd=0.005, headln=0.001, shaftwd=0.01,
+    #col=[1,0,0]):
+    ##somehow select the window (don't know how to specify in OpenGL)
+    ##set color to col
+    #vert = []
+    #vert.append(p)
+    #vert.append((p[0] + laxis[0], p[1] + laxis[1], p[2] + laxis[2]))
+    #Line(vert)
     
-def drawWireCoilPair(windObj, C, norm, cntlf, cntrt, R):
-    #somehow select the window (don't know how to specify in OpenGL)
-    #set color to gray (maybe (0.85,0.85,0.85) but play with it)
-    rleft = ring(pos=cntlf, axis=norm, radius=R)
-    rright = ring(pos=cntrt, axis=norm, radius=R)
+#def drawWireCoilPair(windObj, C, norm, cntlf, cntrt, R):
+    ##somehow select the window (don't know how to specify in OpenGL)
+    ##set color to gray (maybe (0.85,0.85,0.85) but play with it)
+    #rleft = ring(pos=cntlf, axis=norm, radius=R)
+    #rright = ring(pos=cntrt, axis=norm, radius=R)
     
-    return [rleft, rright]
+    #return [rleft, rright]
 
 #def FPSrate(fps):
 
