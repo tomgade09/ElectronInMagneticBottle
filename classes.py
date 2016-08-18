@@ -9,6 +9,9 @@ from math import *
 import numpy as np
 from vectortools import *
 import version
+import ctypes, os, sys, inspect
+
+classpath = os.path.dirname(os.path.abspath(inspect.getsourcefile(lambda:0)))
 
 class Particle(object):
     """Define a particle to be placed in the specified magnetic field.
@@ -153,7 +156,47 @@ class WireCoilPair(object):
         """Draw the pair of Wire Coils."""
         self.pic = drawWireCoilPair(self.wind, self.Cpair, self.axis, self.Cleft,
             self.Cright, self.R)
+    
+    def calcBatPinC(self, p):
+        """Calculate the B field as a result of the wire coils at a position P."""
+        pcnt = [p[0] - self.Cpair[0], p[1] - self.Cpair[1], p[2] - self.Cpair[2]]
+        ppr = rotateVector(pcnt, -self.axiscf_theta, -self.axiscf_phi)
+        lib = ctypes.CDLL(classpath + '/c/WireCoilPairB.so')
+        lib.lfdBx.restype = ctypes.c_double
+        lib.lfdBy.restype = ctypes.c_double
+        lib.lfdBz.restype = ctypes.c_double
+        lib.rtdBx.restype = ctypes.c_double
+        lib.rtdBy.restype = ctypes.c_double
+        lib.rtdBz.restype = ctypes.c_double
+        lib.lfdBx.argtypes = (ctypes.c_int, ctypes.c_double)
+        lib.lfdBy.argtypes = (ctypes.c_int, ctypes.c_double)
+        lib.lfdBz.argtypes = (ctypes.c_int, ctypes.c_double)
+        lib.rtdBx.argtypes = (ctypes.c_int, ctypes.c_double)
+        lib.rtdBy.argtypes = (ctypes.c_int, ctypes.c_double)
+        lib.rtdBz.argtypes = (ctypes.c_int, ctypes.c_double)
         
+        lfBx = integrate.quad(lib.lfdBx, 0, 2*pi, 
+            args=(self.cst,self.R,ppr[0],ppr[1],ppr[2],self.d))
+        lfBy = integrate.quad(lib.lfdBy, 0, 2*pi, 
+            args=(self.cst,self.R,ppr[0],ppr[1],ppr[2],self.d))
+        lfBz = integrate.quad(lib.lfdBz, 0, 2*pi, 
+            args=(self.cst,self.R,ppr[0],ppr[1],ppr[2],self.d))
+        rtBx = integrate.quad(lib.rtdBx, 0, 2*pi, 
+            args=(self.cst,self.R,ppr[0],ppr[1],ppr[2],self.d))
+        rtBy = integrate.quad(lib.rtdBy, 0, 2*pi, 
+            args=(self.cst,self.R,ppr[0],ppr[1],ppr[2],self.d))
+        rtBz = integrate.quad(lib.rtdBz, 0, 2*pi, 
+            args=(self.cst,self.R,ppr[0],ppr[1],ppr[2],self.d))
+        
+        bx = lfBx[0] + rtBx[0]
+        by = lfBy[0] + rtBy[0]
+        bz = lfBz[0] + rtBz[0]
+        
+        if self.axiscf_theta == 0 and self.axiscf_phi == 0:
+            return bx, by, bz
+            
+        return rotateVector([bx,by,bz], self.axiscf_theta, self.axiscf_phi)
+    
     def calcBatP(self, p):
         """Calculate the B field as a result of the wire coils at a position P."""
         pcnt = [p[0] - self.Cpair[0], p[1] - self.Cpair[1], p[2] - self.Cpair[2]]
