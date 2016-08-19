@@ -206,7 +206,6 @@ class WireCoilPair(object):
         pcnt = [p[0] - self.Cpair[0], p[1] - self.Cpair[1], p[2] - self.Cpair[2]]
         ppr = rotateVector(pcnt, -self.axiscf_theta, -self.axiscf_phi)
         #ToDo Add X, Z Axis conditions
-        #ToDo Write functions in C for faster calculations
         #ToDo Separate loop pair and define loops one-by-one
         #Equations to Integrate
         lfdBx = lambda a: self.cst*(-self.R*ppr[2]*sin(a) - self.R*ppr[1]*cos(a) + 
