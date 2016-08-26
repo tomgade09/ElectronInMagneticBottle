@@ -11,7 +11,7 @@ from classes import *
 import csv
 import time
 
-#@profile
+@profile
 def main(deltat,foldstring,usec):
     ind = 0                            #Index (Calculation Counter)
     t = 0                              #Initial time [s]
@@ -47,7 +47,7 @@ def main(deltat,foldstring,usec):
         ind += 1
         if ind % int(1e-8 / deltat) == 0:
             tmp = [ind, t, time.time()-start]
-            print(tmp)
+            #print(tmp)
             pos.append(np.array([t,electron1.p[0],electron1.p[1],electron1.p[2]]))
 
     resultfile = open(foldstring + str(deltat) + str(usec) + '.csv','w+')    

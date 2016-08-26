@@ -1,5 +1,4 @@
 from __future__ import division,print_function
-#ToDo from __future__ import *
 
 # Import visual library.  Only use one of these at a time to avoid namespace conflicts.
 #from VPyDraw import *
@@ -69,7 +68,7 @@ class Particle(object):
         B = cross3DandMult(self.v, pB, c)
         return B[0], B[1], B[2]
     
-    #@profile
+    @profile
     def __updV(self, b, dt):
         """Calculate the new velocity of the particle based on the specified B field."""
         #dv = np.cross(self.v, b) * self.eom * dt #Apparently not faster
@@ -85,7 +84,7 @@ class Particle(object):
         vpr = cross3DandMult(self.v, b, self.eom * dt)
         self.v = [self.v[0] + vpr[0], self.v[1] + vpr[1], self.v[2] + vpr[2]]
         
-    #@profile
+    @profile
     def updP(self, b, dt):
         """Calculate the new position based on the particle's velocity."""
         self.__updV(b, dt)
@@ -95,20 +94,41 @@ class Particle(object):
         self.p = [self.p[0] + self.v[0] * dt, self.p[1] + self.v[1] * dt,
             self.p[2] + self.v[2] * dt]
     
+    @profile
     def foRKvCrossB(self, BFieldObj, h): #Highly experimental!  Not sure if algorithm is implemented right.
     #ToDo verify code/algorithm
-    #ToDo remove np.array for speed
-        k1 = self.eom * np.cross(self.v,BFieldObj.totalBatP(self.p)) * h
-        k2 = self.eom * np.cross(self.v + k1 / 2, BFieldObj.totalBatP(self.p +
-            np.array(self.v) * h / 2)) * h
-        k3 = self.eom * np.cross(self.v + k2 / 2, BFieldObj.totalBatP(self.p +
-            np.array(self.v) * h / 2)) * h
-        k4 = self.eom * np.cross(self.v + k3, BFieldObj.totalBatP(self.p +
-            np.array(self.v) * h)) * h
-    
-        self.v += (k1 + 2 * (k2 + k3) + k4) / 6
-        self.p += self.v * h
+    #ToDo spin out totalBatP into separate processes
+    # Two methods execute at similar speeds - in Py2.7, top executes about 5% faster
+    # In Py 3.5, top executes about 10% slower
+    # Not exactly sure what to pick
+        B1 = BFieldObj.totalBatP(self.p[:])
+        P23 = [self.p[0] + self.v[0] * h / 2, self.p[1] + self.v[1] * h / 2, self.p[2] + self.v[2] * h / 2]
+        B23 = BFieldObj.totalBatP(P23)
+        P4 = [self.p[0] + self.v[0] * h, self.p[1] + self.v[1] * h, self.p[2] + self.v[2] * h]
+        B4 = BFieldObj.totalBatP(P4)
+        V1 = self.v[:]
+        k1 = cross3DandMult(V1,B1,self.eom * h)
+        V2 = [self.v[0] + k1[0] / 2, self.v[1] + k1[1] / 2, self.v[2] + k1[2] / 2]
+        k2 = cross3DandMult(V2,B23,self.eom * h)
+        V3 = [self.v[0] + k2[0] / 2, self.v[1] + k2[1] / 2, self.v[2] + k2[2] / 2]
+        k3 = cross3DandMult(V3,B23,self.eom * h)
+        V4 = [self.v[0] + k3[0], self.v[1] + k3[1], self.v[2] + k3[2]]
+        k4 = cross3DandMult(V4,B4,self.eom * h)
+        
+        k = [(k1[0] + 2 * (k2[0] + k3[0]) + k4[0]) / 6,(k1[1] + 2 * (k2[1] + k3[1]) + k4[1]) / 6, (k1[2] + 2 * (k2[2] + k3[2]) + k4[2]) / 6]
+        
+        vv = [self.v[0] + k[0], self.v[1] + k[1], self.v[2] + k[2]]
+        pp = [vv[0] * h, vv[1] * h, vv[2] * h]
+        
+        B2 = BFieldObj.totalBatP(self.p + np.array(self.v) * h / 2)
+        k11 = self.eom * np.cross(self.v,BFieldObj.totalBatP(self.p)) * h
+        k22 = self.eom * np.cross(self.v + k11 / 2, B2) * h
+        k33 = self.eom * np.cross(self.v + k22 / 2, B2) * h
+        k44 = self.eom * np.cross(self.v + k33, BFieldObj.totalBatP(self.p + np.array(self.v) * h)) * h
             
+        self.v += (k11 + 2 * (k22 + k33) + k44) / 6
+        self.p += self.v * h
+        
 class Electron(Particle):
     """Define an electron as a specific type of 'Particle'"""
     def __init__(self, windObj, po, vo):
