@@ -1,2 +1,2 @@
-__version__ = '4.2.1'
-__verdate__ = '28 Jul 16'
+__version__ = '4.3.0'
+__verdate__ = '26 Aug 16'

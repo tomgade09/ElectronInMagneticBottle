@@ -1,4 +1,4 @@
-from __future__ import division
+from __future__ import division,print_function
 
 import os, sys, inspect
 a = os.path.dirname(os.path.abspath(inspect.getsourcefile(lambda:0)))
@@ -13,7 +13,7 @@ from scipy import integrate
 def calcBcoils(px, py, pz):
     eta = float(N*I*10**(-5))          #Constant "muo * I * 10^2 / 4 * pi" [T*cm]
     
-    print N, I, R, d
+    print(N, I, R, d)
     
     #Equations to Integrate
     lfdBx = lambda a: eta*(-R*pz*sin(a) - R*py*cos(a) + R**2) / (((px + d)**2 + (py - R*cos(a))**2 + (pz - R*sin(a))**2)**(3/2))
@@ -46,7 +46,7 @@ ver = 4
 
 if ver == 4:
     wireCoils = WireCoilPair(None, 1, 1, 5, 5)
-    print wireCoils.N, wireCoils.I, wireCoils.R, wireCoils.d
+    print(wireCoils.N, wireCoils.I, wireCoils.R, wireCoils.d)
     Bx, By, Bz = wireCoils.calcBatP(Px, Py, Pz)
 elif ver == 3:
     d = 5
@@ -55,4 +55,4 @@ elif ver == 3:
     I = 1                              #Current [A]
     Bx, By, Bz = calcBcoils(Px, Py, Pz)
     
-print Bx, By, Bz
+print(Bx, By, Bz)

@@ -1,4 +1,4 @@
-from __future__ import division
+from __future__ import division,print_function
 
 import os, sys, inspect
 a = os.path.dirname(os.path.abspath(inspect.getsourcefile(lambda:0)))
@@ -11,6 +11,7 @@ from classes import *
 import csv
 import time
 
+#@profile
 def main(deltat,foldstring,usec):
     ind = 0                            #Index (Calculation Counter)
     t = 0                              #Initial time [s]
@@ -22,7 +23,7 @@ def main(deltat,foldstring,usec):
     loopaxis = [1,0,0]
     pos = []
     
-    print deltat0
+    print(deltat)
     
     windObj1 = None    
     wireCoils = WireCoilPair(windObj1, wccenter, loopaxis, 1, 1, 5, 5)    
@@ -46,7 +47,7 @@ def main(deltat,foldstring,usec):
         ind += 1
         if ind % int(1e-8 / deltat) == 0:
             tmp = [ind, t, time.time()-start]
-            print tmp
+            print(tmp)
             pos.append(np.array([t,electron1.p[0],electron1.p[1],electron1.p[2]]))
 
     resultfile = open(foldstring + str(deltat) + str(usec) + '.csv','w+')    
@@ -55,20 +56,19 @@ def main(deltat,foldstring,usec):
     
     end = time.time()
     tottime = end - start
-    print tottime
-    print deltat, usec
+    print(tottime)
+    print(deltat, usec)
     
     return [deltat, tottime, float(usec)]
 
 if __name__ == "__main__":
-    fstr = './TestC/'
+    fstr = './TestLineProf/'
     timed = []
-    timed.append(main(1e-8,fstr,False))
-    timed.append(main(1e-8,fstr,True))
-    for j in range(-9,-12,-1):
-        for i in [5,2,1]:
-            for k in [False, True]:
-                timed.append(main(i*(10**j),fstr,k))
+    #timed.append(main(1e-8,fstr,False))
+    timed.append(main(1e-10,fstr,True))
+    #for j in range(-9,-10,-1):
+        #for i in [1]:
+            #timed.append(main(i*(10**j),fstr,True))
     
     timefile = open(fstr + 'time.csv','w+')
     wrt = csv.writer(timefile)

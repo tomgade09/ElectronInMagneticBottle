@@ -1,4 +1,4 @@
-from __future__ import division
+from __future__ import division,print_function
 
 import os, sys, inspect
 a = os.path.dirname(os.path.abspath(inspect.getsourcefile(lambda:0)))
@@ -14,4 +14,4 @@ y = [[0,0,0],[0,1,0]]
 
 w = t.superimposition_matrix(x, y)
 
-print w
+print(w)

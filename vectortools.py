@@ -33,3 +33,7 @@ def rotateVector(v, rot_theta, rot_phi):
     tmp_rho, tmp_theta, tmp_phi = cartesianToSpherical(v)
     
     return sphericalToCartesian(tmp_rho, tmp_theta + rot_theta, tmp_phi + rot_phi)
+    
+def cross3DandMult(a,b,c):
+    return [(a[1] * b[2] - a[2] * b[1]) * c, (a[2] * b[0] - a[0] * b[2]) * c,
+        (a[0] * b[1] - a[1] * b[0]) * c]

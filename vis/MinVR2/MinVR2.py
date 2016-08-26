@@ -1,3 +1,4 @@
+from __future__ import print_function
 import sys, os, inspect
 
 from ctypes import cdll
@@ -73,15 +74,15 @@ class VREventHandler(object):
 	def __init__(self):
 		pass
 	def onVREvent(self, eventName):
-		print "Event"
+		print("Event")
 
 class VRRenderHandler(object):
 	def __init__(self):
 		pass
 	def onVRRenderScene(self, renderState):
-		print "Rendering Scene"
+		print("Rendering Scene")
 	def onVRRenderContext(self):
-		print "Rendering Context"
+		print("Rendering Context")
 
 class VRDataIndex(object):
 	def __init__(self, index):

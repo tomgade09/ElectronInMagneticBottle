@@ -1,4 +1,5 @@
-from __future__ import division
+from __future__ import division,print_function
+#ToDo from __future__ import *
 
 # Import visual library.  Only use one of these at a time to avoid namespace conflicts.
 #from VPyDraw import *
@@ -40,7 +41,7 @@ class Particle(object):
     def initDraw(self, intrvl, traillng, Dcolor=(0,1,0)):
         """Draw a point object representing the particle in the object specified by self.wind.  intrvl represents how often to 'draw' a point.  traillng represents how long of a 'trail' to leave behind the current position of the particle."""
         if self.pic is not None:
-            print "Pic has already been initialized.  Use updDraw to change the position."
+            print("Pic has already been initialized. Use updDraw to change the position.")
             return
         self.pic = drawParticlePic(self.wind, self.p, intrvl, traillng, Dcolor)
         return self.pic
@@ -48,34 +49,55 @@ class Particle(object):
     def updDraw(self):
         """Update the location of the point object drawn with initDraw.  Obviously, it can't be updated if it hasn't been initialized.  Use the initDraw function first."""
         if self.pic is None:
-            print "Pic has not been initialized.  Use initDraw to create a picture of the particle first."
+            print("Pic has not been initialized.  Use initDraw to create a picture of the particle first.")
             return
         updateParticlePic(self.wind, self.pic, self.p)
     
     def calcBatP(self, pB):
         """Calculate B at a point pB due to this particle."""
-        pB = pB[:] #If particle.p is passed in, need to change pB to a list vs a pointer
-        pB -= np.array(self.p)
-        if abs(pB[0]) <= 10e-15 and abs(pB[1]) <= 10e-15 and abs(pB[2]) <=10e-15:
-            return 0, 0, 0
+        #pB = pB[:] #If particle.p is passed in, need to change pB to a list vs a pointer
+        #pB -= np.array(self.p)
+        pB = [pB[0] - self.p[0], pB[1] - self.p[1], pB[2] - self.p[2]]
+        if abs(pB[0]) <= 10e-15 and abs(pB[1]) <= 10e-15 and abs(pB[2]) <= 10e-15:
+            return 0, 0, 0 #B due to point charge is 0 at the location of the pt charge
         c = 10e-5 * self.q / sqrt(pB[0]**2 + pB[1]**2 + pB[2]**2)**3
-        b = np.cross(self.v, pB)
-        b = np.array(b) * c
-        return b[0], b[1], b[2]
+        #b = np.cross(self.v, pB)
+        #b = np.array(b) * c
+        #b = [(self.v[1] * pB[2] - self.v[2] * pB[1]) * c,
+            #(self.v[2] * pB[0] - self.v[0] * pB[2]) * c,
+            #(self.v[0] * pB[1] - self.v[1] * pB[0]) * c]
+        B = cross3DandMult(self.v, pB, c)
+        return B[0], B[1], B[2]
     
+    #@profile
     def __updV(self, b, dt):
         """Calculate the new velocity of the particle based on the specified B field."""
-        dv = np.cross(self.v, b) * self.eom * dt
-        self.v += dv
+        #dv = np.cross(self.v, b) * self.eom * dt #Apparently not faster
+        #self.v += dv
+        #dv = [self.v[1]*b[2]-self.v[2]*b[1], #Below cuts 20% time off
+            #self.v[2]*b[0]-self.v[0]*b[2],
+            #self.v[0]*b[1]-self.v[1]*b[0]]
+        #for i in range(3):
+            #self.v[i] += (dv[i] * self.eom * dt)
+        #self.v = [self.v[0] + (self.v[1] * b[2] - self.v[2] * b[1]) * self.eom * dt,
+            #self.v[1] + (self.v[2] * b[0] - self.v[0] * b[2]) * self.eom * dt,
+            #self.v[2] + (self.v[0] * b[1] - self.v[1] * b[0]) * self.eom * dt]
+        vpr = cross3DandMult(self.v, b, self.eom * dt)
+        self.v = [self.v[0] + vpr[0], self.v[1] + vpr[1], self.v[2] + vpr[2]]
         
+    #@profile
     def updP(self, b, dt):
         """Calculate the new position based on the particle's velocity."""
         self.__updV(b, dt)
-        #self.p += self.v * dt #For some reason, doesn't work, but would be quicker.
-        for i in range(3):
-            self.p[i] += self.v[i] * dt
+        #self.p += self.v * dt #For some reason, doesn't work.
+        #for i in range(3): #Slower code than below
+            #self.p[i] += self.v[i] * dt
+        self.p = [self.p[0] + self.v[0] * dt, self.p[1] + self.v[1] * dt,
+            self.p[2] + self.v[2] * dt]
     
     def foRKvCrossB(self, BFieldObj, h): #Highly experimental!  Not sure if algorithm is implemented right.
+    #ToDo verify code/algorithm
+    #ToDo remove np.array for speed
         k1 = self.eom * np.cross(self.v,BFieldObj.totalBatP(self.p)) * h
         k2 = self.eom * np.cross(self.v + k1 / 2, BFieldObj.totalBatP(self.p +
             np.array(self.v) * h / 2)) * h
@@ -118,8 +140,10 @@ class WireCoilPair(object):
     def __init__(self, windObj, Cpair, axis, N, I, R, d, name=None):
         """Initiate a WireCoilPair object."""
         self.wind = windObj
-        self.Cpair = np.array(Cpair)
-        self.axis = np.array(axis)
+        #self.Cpair = np.array(Cpair)
+        self.Cpair = Cpair
+        #self.axis = np.array(axis)
+        self.axis = axis
         self.N = N; self.I = I; self.R = R; self.d = d
         self.name = name
         self.cst = float(self.N * self.I * 10**(-5))
@@ -145,12 +169,16 @@ class WireCoilPair(object):
         else: #All other cases calculate center points for loops
             self.Cright = sphericalToCartesian(self.d, self.axis_theta, self.axis_phi)
             if self.axis_phi > pi:
-                self.Cleft = sphericalToCartesian(self.d, pi-self.axis_theta,
-                    self.axis_phi-pi)
+                self.Cleft = sphericalToCartesian(self.d, pi - self.axis_theta,
+                    self.axis_phi - pi)
             else:
-                self.Cleft = sphericalToCartesian(self.d, pi-self.axis_theta,
-                    self.axis_phi+pi)
-            self.Cright += self.Cpair; self.Cleft += self.Cpair
+                self.Cleft = sphericalToCartesian(self.d, pi - self.axis_theta,
+                    self.axis_phi + pi)
+            #self.Cright += self.Cpair; self.Cleft += self.Cpair
+            self.Cright = [self.Cright[0] + self.Cpair[0], self.Cright[1] + self.Cpair[1],
+                self.Cright[2] + self.Cpair[2]]
+            self.Cleft = [self.Cleft[0] + self.Cpair[0], self.Cleft[1] + self.Cpair[1],
+                self.Cleft[2] + self.Cpair[2]]
 
     def initDraw(self):
         """Draw the pair of Wire Coils."""
@@ -172,8 +200,9 @@ class WireCoilPair(object):
         c1 = -self.cst * self.R * ppr[2]
         c2 = -self.cst * self.R * ppr[1]
         c3 = self.cst * self.R**2
-        c4lf = ppr[0]**2+ppr[1]**2+ppr[2]**2 + 2*ppr[0]*self.d + self.d**2 + self.R**2
-        c4rt = ppr[0]**2+ppr[1]**2+ppr[2]**2 - 2*ppr[0]*self.d + self.d**2 + self.R**2
+        d2 = ppr[0]**2 + ppr[1]**2 + ppr[2]**2
+        c4lf = d2 + 2*ppr[0]*self.d + self.d**2 + self.R**2
+        c4rt = d2 - 2*ppr[0]*self.d + self.d**2 + self.R**2
         c5 = -2 * ppr[1] * self.R
         c6 = -2 * ppr[2] * self.R
         c7lf = self.cst * self.R * (ppr[0] + self.d)
@@ -247,17 +276,20 @@ class WireCoilPair(object):
 
 class BField(object):
     """Define a B Field object containing the elements in BObjList."""
-    def __init__(self, windObj, BObjList=[], name=None):
+    def __init__(self, windObj, BObjList=[], PartList=[], name=None):
         """Initialize a B Field object."""
         self.windObj = windObj
         self.BObjList = BObjList[:]
+        self.particleList = PartList[:]
         self.name = name
-        #ToDo Define Particle list separate from BObjList
         
     def totalBatP(self, p):
         """Calculate total B at p due to all objects in BObjList.  Calculates them one at a time and adds them together."""
         Bx = By = Bz = 0
         for BObj in self.BObjList:
+            bx, by, bz = BObj.calcBatP(p)
+            Bx += bx; By += by; Bz += bz
+        for BObj in self.particleList:
             bx, by, bz = BObj.calcBatP(p)
             Bx += bx; By += by; Bz += bz
         

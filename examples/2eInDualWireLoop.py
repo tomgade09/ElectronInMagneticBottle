@@ -1,4 +1,4 @@
-from __future__ import division
+from __future__ import division,print_function
 
 import os, sys, inspect
 a = os.path.dirname(os.path.abspath(inspect.getsourcefile(lambda:0)))
@@ -61,8 +61,8 @@ def main():
         t += dt                  #time increase [s]
         ind += 1                 #index increase
         updateTimeClock(windObj1, relclockObj1, t)
-        #print electron1.p
-        #print electron2.p
+        #print(electron1.p)
+        #print(electron2.p)
         
     while True:
         FPSrate(10000)

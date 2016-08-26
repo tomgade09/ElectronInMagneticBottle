@@ -1,4 +1,4 @@
-from __future__ import division
+from __future__ import division,print_function
 
 import os, sys, inspect
 a = os.path.dirname(os.path.abspath(inspect.getsourcefile(lambda:0)))
@@ -36,4 +36,4 @@ s = io.StringIO()
 sortby = 'cumulative'
 ps = pstats.Stats(pr, stream=s).sort_stats(sortby)
 ps.print_stats()
-print s.getvalue()
+print(s.getvalue())

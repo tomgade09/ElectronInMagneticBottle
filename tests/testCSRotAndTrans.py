@@ -1,4 +1,4 @@
-from __future__ import division
+from __future__ import division,print_function
 
 import os, sys, inspect
 a = os.path.dirname(os.path.abspath(inspect.getsourcefile(lambda:0)))
@@ -61,8 +61,8 @@ for i in range(0,9999,1):
     
     ind += 1
 
-print elec_x.px - elec_y.py, elec_x.py + elec_y.px, elec_x.pz - elec_x.pz
-print elec_x.px - elec_z.pz, elec_x.py - elec_z.py, elec_x.pz - elec_z.px
+print(elec_x.px - elec_y.py, elec_x.py + elec_y.px, elec_x.pz - elec_x.pz)
+print(elec_x.px - elec_z.pz, elec_x.py - elec_z.py, elec_x.pz - elec_z.px)
 
 #if __name__ == "__main__":
     #main()

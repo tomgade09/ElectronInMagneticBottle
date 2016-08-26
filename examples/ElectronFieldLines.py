@@ -1,4 +1,4 @@
-from __future__ import division
+from __future__ import division,print_function
 
 import os, sys, inspect
 a = os.path.dirname(os.path.abspath(inspect.getsourcefile(lambda:0)))
@@ -26,7 +26,7 @@ B.drawBlines(windObj1, [0.1,0.09,0.1], numiter=100, multlng=1e16)
 B.drawBlines(windObj1, [0.1,0.1,0.11], numiter=100, multlng=1e16)
 B.drawBlines(windObj1, [0.1,0.1,0.09], numiter=100, multlng=1e16)
 
-print "done"
+print("done")
 
 while True:
     FPSrate(30)
