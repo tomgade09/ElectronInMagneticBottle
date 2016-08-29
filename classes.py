@@ -13,6 +13,15 @@ import ctypes, os, sys, inspect
 
 classpath = os.path.dirname(os.path.abspath(inspect.getsourcefile(lambda:0)))
 
+from sys import platform as _platform
+libName = 'WireCoilB'
+if _platform == "linux" or _platform == "linux2":
+    libFilePath = classpath + '/lib/' + libName + '.so'
+elif _platform == "darwin": #All of MagBottlePy is untested on Darwin
+    libFilePath = classpath + '/lib/' + libName + '.dylib'
+elif _platform == "win32":
+    libFilePath = classpath + '/lib/' + libName + '.dll'
+
 class Particle(object):
     """Define a particle to be placed in the specified magnetic field.
     
@@ -101,6 +110,7 @@ class Particle(object):
     # Two methods execute at similar speeds - in Py2.7, top executes about 5% faster
     # In Py 3.5, top executes about 10% slower
     # Not exactly sure what to pick
+    # Even with MKL on a Core2Duo, numpy is slower - not sure about newer procs
         B1 = BFieldObj.totalBatP(self.p[:])
         P23 = [self.p[0] + self.v[0] * h / 2, self.p[1] + self.v[1] * h / 2, self.p[2] + self.v[2] * h / 2]
         B23 = BFieldObj.totalBatP(P23)
@@ -209,7 +219,8 @@ class WireCoilPair(object):
         """Calculate the B field as a result of the wire coils at a position P."""
         pcnt = [p[0] - self.Cpair[0], p[1] - self.Cpair[1], p[2] - self.Cpair[2]]
         ppr = rotateVector(pcnt, -self.axiscf_theta, -self.axiscf_phi)
-        lib = ctypes.CDLL(classpath + '/c/WireCoilPairB.so') # For Linux
+        
+        lib = ctypes.CDLL(libFilePath)        
         lib.dBx.restype = ctypes.c_double
         lib.dBy.restype = ctypes.c_double
         lib.dBz.restype = ctypes.c_double
