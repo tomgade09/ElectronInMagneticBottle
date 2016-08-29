@@ -77,7 +77,7 @@ class Particle(object):
         B = cross3DandMult(self.v, pB, c)
         return B[0], B[1], B[2]
     
-    @profile
+    #@profile #For running with line/memory profiler
     def __updV(self, b, dt):
         """Calculate the new velocity of the particle based on the specified B field."""
         #dv = np.cross(self.v, b) * self.eom * dt #Apparently not faster
@@ -93,7 +93,7 @@ class Particle(object):
         vpr = cross3DandMult(self.v, b, self.eom * dt)
         self.v = [self.v[0] + vpr[0], self.v[1] + vpr[1], self.v[2] + vpr[2]]
         
-    @profile
+    #@profile #For running with line/memory profiler
     def updP(self, b, dt):
         """Calculate the new position based on the particle's velocity."""
         self.__updV(b, dt)
@@ -103,7 +103,7 @@ class Particle(object):
         self.p = [self.p[0] + self.v[0] * dt, self.p[1] + self.v[1] * dt,
             self.p[2] + self.v[2] * dt]
     
-    @profile
+    #@profile #For running with line/memory profiler
     def foRKvCrossB(self, BFieldObj, h): #Highly experimental!  Not sure if algorithm is implemented right.
     #ToDo verify code/algorithm
     #ToDo spin out totalBatP into separate processes

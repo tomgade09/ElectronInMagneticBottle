@@ -11,7 +11,7 @@ from classes import *
 import csv
 import time
 
-@profile
+#@profile #For running with line/memory profiler
 def main(deltat,foldstring,usec):
     ind = 0                            #Index (Calculation Counter)
     t = 0                              #Initial time [s]
@@ -62,7 +62,7 @@ def main(deltat,foldstring,usec):
     return [deltat, tottime, float(usec)]
 
 if __name__ == "__main__":
-    fstr = './TestLineProf/'
+    fstr = './../__TestResults__/TestNewC/'
     timed = []
     #timed.append(main(1e-8,fstr,False))
     timed.append(main(1e-10,fstr,True))
