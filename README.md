@@ -22,8 +22,7 @@ Use as is or compile the C optimizations (instructions below).
 
 #### Build C Optimization Library (optional)
 
-##### Note: 
-This is only necessary if you desire to utilize the code developed in C (used to speed up the calculations by a little over 2x).  This requires a compatible compiler.  For Windows, CMake (3.6.0-rc4 as of this writing) and Visual Studio (Community 2015) are used.  VS can be obtained for free from Microsoft's website.  Google search both to easily find.  On Linux, gcc is used.
+*Note: This is only necessary if you desire to utilize the code developed in C (used to speed up the calculations by a little over 2x).  This requires a compatible compiler.  For Windows, CMake (3.6.0-rc4 as of this writing) and Visual Studio (Community 2015) are used.  VS can be obtained for free from Microsoft's website.  Google search both to easily find.  On Linux, gcc is used.*
 
 * Windows (CMake and Visual Studio)
 
