@@ -64,13 +64,13 @@ BField(windObj, BObjList=[], PartList=[])
   *someVariable* = BField(windObj, BObjList=[*someList*], PartList=[*someList*])
   ```
 
-* Arguments (__init__)
+* Arguments (\_\_init\_\_)
 
   1. ```windObj``` is a reference to the object that represents the window you want to draw to.  If using MagBottlePy in a purely computational way (no visualization is desired), set this to None.
   2. ```BObjList``` is a list of Magnetic Field producing objects.  This list is iterated over in the TotalBatP method.
   3. ```PartList``` is a list of particles placed in the magnetic field.  These objects may also produce a magnetic field (such as the included classes: electrons, protons, and positrons).
   
-* Returns (__init__)
+* Returns (\_\_init\_\_)
   *No Returns*
 
 * Internal variables
@@ -81,11 +81,16 @@ BField(windObj, BObjList=[], PartList=[])
   
 * Methods
 
-  ```totalBatP(p)```
+  ```
+  totalBatP(p)
+  ```
   
   *Calculate the magnetic field at a point, ```p```, due to all objects in BObjList and particleList.  ```p``` is defined as a tuple or list of three values: [x position, y position, z position].  Returns a list of x, y, and z values of a vector representing the B field in the form [Bx, By, Bz].*
   
-  ```drawBlines(self, windObj, p, pupbound=[None,None,None], plobound=[None,None,None], numiter=None, linelength=None, multlng=None)```
+  ```
+  drawBlines(self, windObj, p, pupbound=[None,None,None], plobound=[None,None,None], numiter=None, linelength=None, multlng=None)
+  ```
+  
   *Calculate and draw B field lines starting at a point ```p``` represented as a list or tuple of three values: [x position, y position, z position].  ```[pup|plo]bound``` represents the x,y,z values of the upper|lower bounds.  ```numiter``` allows for the specification of a number of iterations instead of a bound.  ```linelength``` allows specification of a length of B Field line instead of a bound or number of iterations.  ```multlng``` allows for scaling the B vector by a constant.*
 
 ## Extending the functionality of MagBottlePy
