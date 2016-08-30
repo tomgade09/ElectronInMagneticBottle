@@ -13,10 +13,10 @@ MagBottlePy is compatible with all flavors of Python, OS platforms (Darwin is un
 
 #### Download Repository
 
-'''
-git clone https://github.com/tomgade09/MagBottlePy
-cd MagBottlePy
-'''
+  '''
+  git clone https://github.com/tomgade09/MagBottlePy
+  cd MagBottlePy
+  '''
 
 Use as is or compile the C optimizations (instructions below).
 
@@ -40,10 +40,10 @@ Note: Ensure to select the applicable processor architecture.  A library compile
 
 1. Change to c directory in the project root from the command line.  Type the following.
 
-'''
-gcc -shared -o WireCoilB.so -fPIC WireCoilB.c
-mv WireCoilB.so ./../lib/
-'''
+  '''
+  gcc -shared -o WireCoilB.so -fPIC WireCoilB.c
+  mv WireCoilB.so ./../lib/
+  '''
 
 .so Library file should be moved to the appropriate directory with these commands.  Python code will point to the library automatically.
 
