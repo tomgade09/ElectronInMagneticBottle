@@ -26,19 +26,19 @@ Use as is or compile the C optimizations (instructions below).
 
 * Windows (CMake and Visual Studio)
 
-1. Run CMake gui.
-2. Click "Browse Source" and point to c directory in MagBottlePy root.
-3. Click "Browse Build" and point to c/build directory in MagBottlePy root.  If the folder doesn't exist, create it.
-4. Click "Configure".
-5. Select the appropriate version of VS ("Visual Studio 14 2015" at the time of writing) and click "Finish".  Ignore warnings.
-Note: Ensure to select the applicable processor architecture.  A library compiled for 64 bit applications will not work in 32 bit Python!  If you intend to use a 64 bit version of Python AND have a 64 bit version of Windows installed, click the version followed by "Win64" ("Visual Studio ## YEAR Win64").  Otherwise, click the appropriate version of VS without anything following the year ("Visual Studio ## YEAR").  You can ignore "ARM" unless you are going to run on a mobile device or Raspberry Pi (unlikely).
-6. Click "Generate".
-7. Open the build folder and double click the *.sln file.  This file should open in VS.  In the menu bar go to "Build" > "Build Solution".
-8. Once complete, right click on "Install" in the Solution Explorer (usually on the left side of the screen.  Click "Build".  DLL file should be installed to the lib folder in the project root.  Python code will point to the library automatically.
+	1. Run CMake gui.
+	2. Click "Browse Source" and point to c directory in MagBottlePy root.
+	3. Click "Browse Build" and point to c/build directory in MagBottlePy root.  If the folder doesn't exist, create it.
+	4. Click "Configure".
+	5. Select the appropriate version of VS ("Visual Studio 14 2015" at the time of writing) and click "Finish".  Ignore warnings.
+	* Note: Ensure to select the applicable processor architecture.  A library compiled for 64 bit applications will not work in 32 bit Python!  If you intend to use a 64 bit version of Python AND have a 64 bit version of Windows installed, click the version followed by "Win64" ("Visual Studio ## YEAR Win64").  Otherwise, click the appropriate version of VS without anything following the year ("Visual Studio ## YEAR").  You can ignore "ARM" unless you are going to run on a mobile device or Raspberry Pi (unlikely).
+	6. Click "Generate".
+	7. Open the build folder and double click the *.sln file.  This file should open in VS.  In the menu bar go to "Build" > "Build Solution".
+	8. Once complete, right click on "Install" in the Solution Explorer (usually on the left side of the screen.  Click "Build".  DLL file should be installed to the lib folder in the project root.  Python code will point to the library automatically.
 
 * Linux (much easier)
 
-1. Change to c directory in the project root from the command line.  Type the following.
+	1. Change to c directory in the project root from the command line.  Type the following.
 
   ```
   gcc -shared -o WireCoilB.so -fPIC WireCoilB.c
