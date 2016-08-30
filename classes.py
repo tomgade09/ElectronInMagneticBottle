@@ -1,8 +1,8 @@
 from __future__ import division,print_function
 
 # Import visual library.  Only use one of these at a time to avoid namespace conflicts.
-#from VPyDraw import *
-from OpenGLDraw import *
+from VPyDraw import *
+#from OpenGLDraw import *
 
 from scipy import integrate
 from math import *
