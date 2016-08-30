@@ -51,8 +51,9 @@ Untested
 
 Of course, this documentation will assume a working knowledge of Python.  Any arguments defined as ```argument=something``` are optional.
 
-#### Classes
+### Classes
 
+#### BField
 ```
 BField(windObj, BObjList=[], PartList=[])
 ```
