@@ -49,8 +49,8 @@ mv WireCoilB.so ./../lib/
 
 ## Classes and functions: A brief documentation
 
-#### Extending the functionality of MagBottlePy
+## Extending the functionality of MagBottlePy
 
-## Adding additional B Field producing elements
+#### Adding additional B Field producing elements
 
-## Speeding up B Field iterative calculations with C
+#### Speeding up B Field iterative calculations with C
