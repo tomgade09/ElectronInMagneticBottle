@@ -31,23 +31,61 @@ Use as is or compile the C optimizations (instructions below).
 3. Click "Browse Build" and point to c/build directory in MagBottlePy root.  If the folder doesn't exist, create it.
 4. Click "Configure".
 5. Select the appropriate version of VS ("Visual Studio 14 2015" at the time of writing) and click "Finish".  Ignore warnings.
-*Note: Ensure to select the applicable processor architecture.  A library compiled for 64 bit applications will not work in 32 bit Python!  If you intend to use a 64 bit version of Python AND have a 64 bit version of Windows installed, click the version followed by "Win64" ("Visual Studio ## YEAR Win64").  Otherwise, click the appropriate version of VS without anything following the year ("Visual Studio ## YEAR").  You can ignore "ARM" unless you are going to run on a mobile device or Raspberry Pi (unlikely).*
+*Note: Ensure to select the applicable processor architecture.  A library compiled for 64 bit applications will not work in 32 bit Python and vice versa!  If you intend to use a 64 bit version of Python AND have a 64 bit version of Windows installed, click the version followed by "Win64" ("Visual Studio ## YEAR Win64").  Otherwise, click the appropriate version of VS without anything following the year ("Visual Studio ## YEAR").  You can ignore "ARM" unless you are going to run on a mobile device or Raspberry Pi (unlikely).*
 6. Click "Generate".
 7. Open the build folder and double click the *.sln file.  This file should open in VS.  In the menu bar go to "Build" > "Build Solution".
 8. Once complete, right click on "Install" in the Solution Explorer (usually on the left side of the screen.  Click "Build".  DLL file should be installed to the lib folder in the project root.  Python code will point to the library automatically.
 
 * Linux (much easier)
 
-1. Change to c directory in the project root from the command line.  Type the following.
-
   ```
+  # Run from c directory in the project root
   gcc -shared -o WireCoilB.so -fPIC WireCoilB.c
   mv WireCoilB.so ./../lib/
   ```
-
-.so Library file should be moved to the appropriate directory with these commands.  Python code will point to the library automatically.
+  
+* Mac OS X
+Untested
 
 ## Classes and functions: A brief documentation
+
+Of course, this documentation will assume a working knowledge of Python.  Any arguments defined as ```argument=something``` is optional.
+
+#### Classes
+
+```
+BField(windObj, BObjList=[], PartList=[])
+```
+*Define a Magnetic Field Object with the below arguments, variables, and methods.  Multiple can be defined in one program, allowing for simultaneous execution of non-interacting fields (could be useful for comparing two fields side by side).*
+
+* Use
+
+  ```
+  *someVariable* = BField(windObj, BObjList=[*someList*], PartList=[*someList*])
+  ```
+
+* Arguments (__init__)
+
+  1. ```windObj``` is a reference to the object that represents the window you want to draw to.  If using MagBottlePy in a purely computational way (no visualization is desired), set this to None.
+  2. ```BObjList``` is a list of Magnetic Field producing objects.  This list is iterated over in the TotalBatP method.
+  3. ```PartList``` is a list of particles placed in the magnetic field.  These objects may also produce a magnetic field (such as the included classes: electrons, protons, and positrons).
+  
+* Returns (__init__)
+  *No Returns*
+
+* Internal variables
+
+  1. windObj - see above
+  2. BObjList - see above
+  3. particleList - see above ```PartList```
+  
+* Methods
+
+  ```totalBatP(p)```
+  *Calculate the magnetic field at a point, ```p```, due to all objects in BObjList and particleList.  ```p``` is defined as a tuple or list of three values: [x position, y position, z position].  Returns a list of x, y, and z values of a vector representing the B field in the form [Bx, By, Bz].*
+  
+  ```drawBlines(self, windObj, p, pupbound=[None,None,None], plobound=[None,None,None], numiter=None, linelength=None, multlng=None)```
+  *Calculate and draw B field lines starting at a point ```p``` represented as a list or tuple of three values: [x position, y position, z position].  ```[pup|plo]bound``` represents the x,y,z values of the upper|lower bounds.  ```numiter``` allows for the specification of a number of iterations instead of a bound.  ```linelength``` allows specification of a length of B Field line instead of a bound or number of iterations.  ```multlng``` allows for scaling the B vector by a constant.*
 
 ## Extending the functionality of MagBottlePy
 

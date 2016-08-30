@@ -333,7 +333,7 @@ class BField(object):
         
         return [Bx, By, Bz]
     
-    def drawBlines(self, windObj, p, pupbound=[None,None,None],
+    def drawBlines(self, p, pupbound=[None,None,None],
         plobound=[None,None,None], numiter=None, linelength=None, multlng=None):
         """Draw B field lines starting at po and ending at ####."""
         loopind = 0
@@ -359,5 +359,5 @@ class BField(object):
             elif multlng is not None:
                 bx *= multlng; by *= multlng; bz *= multlng
             
-            drawLine(windObj, p, [bx,by,bz])
+            drawLine(self.windObj, p, [bx,by,bz])
             p[0] += bx; p[1] += by; p[2] += bz
