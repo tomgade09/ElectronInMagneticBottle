@@ -49,7 +49,7 @@ Untested
 
 ## Classes and functions: A brief documentation
 
-Of course, this documentation will assume a working knowledge of Python.  Any arguments defined as ```argument=something``` is optional.
+Of course, this documentation will assume a working knowledge of Python.  Any arguments defined as ```argument=something``` are optional.
 
 #### Classes
 
@@ -82,6 +82,7 @@ BField(windObj, BObjList=[], PartList=[])
 * Methods
 
   ```totalBatP(p)```
+  
   *Calculate the magnetic field at a point, ```p```, due to all objects in BObjList and particleList.  ```p``` is defined as a tuple or list of three values: [x position, y position, z position].  Returns a list of x, y, and z values of a vector representing the B field in the form [Bx, By, Bz].*
   
   ```drawBlines(self, windObj, p, pupbound=[None,None,None], plobound=[None,None,None], numiter=None, linelength=None, multlng=None)```
