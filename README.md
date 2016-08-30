@@ -13,14 +13,17 @@ MagBottlePy is compatible with all flavors of Python, OS platforms (Darwin is un
 
 #### Download Repository
 
-	git clone https://github.com/tomgade09/MagBottlePy
-	cd MagBottlePy
+'''
+git clone https://github.com/tomgade09/MagBottlePy
+cd MagBottlePy
+'''
 
 Use as is or compile the C optimizations (instructions below).
 
 #### Build C Optimization Library (optional)
 
-##### Note: this is only necessary if you desire to utilize the code developed in C (used to speed up the calculations by a little over 2x).  This requires a compatible compiler.  For Windows, CMake (3.6.0-rc4 as of this writing) and Visual Studio (Community 2015) are used.  VS can be obtained for free from Microsoft's website.  Google search both to easily find.  On Linux, gcc is used.
+##### Note: 
+This is only necessary if you desire to utilize the code developed in C (used to speed up the calculations by a little over 2x).  This requires a compatible compiler.  For Windows, CMake (3.6.0-rc4 as of this writing) and Visual Studio (Community 2015) are used.  VS can be obtained for free from Microsoft's website.  Google search both to easily find.  On Linux, gcc is used.
 
 * Windows (CMake and Visual Studio)
 
@@ -37,9 +40,11 @@ Note: Ensure to select the applicable processor architecture.  A library compile
 * Linux (much easier)
 
 1. Change to c directory in the project root from the command line.  Type the following.
-	
-	gcc -shared -o WireCoilB.so -fPIC WireCoilB.c
-	mv WireCoilB.so ./../lib/
+
+'''
+gcc -shared -o WireCoilB.so -fPIC WireCoilB.c
+mv WireCoilB.so ./../lib/
+'''
 
 .so Library file should be moved to the appropriate directory with these commands.  Python code will point to the library automatically.
 
