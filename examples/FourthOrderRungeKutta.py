@@ -14,9 +14,9 @@ from VPyDraw import *
 def main():
     ind = 0                            #Index (Calculation Counter)
     t = 0                              #Initial time [s]
-    dt = 1*10**-8
+    dt = 1*10**-7
     
-    e1center = [4,2,2]
+    e1center = [-4.75,0,0]
     e1vel = [1000,1000,1000]
     wccenter = [0,0,0]
     loopaxis = [1,0,0]
@@ -25,7 +25,7 @@ def main():
     windObj1 = drawWindow(1920, 1080, e1center)
     relclockObj1 = drawTimeClock(windObj1, [-6.5,0,0], t)
     
-    wireCoils = WireCoilPair(windObj1, wccenter, loopaxis, 100, 1, 5, 5)
+    wireCoils = WireCoilPair(windObj1, wccenter, loopaxis, 1, 1, 5, 5)
     wireCoils.initDraw()
     
     electron1 = Electron(windObj1, e1center, e1vel)
@@ -50,8 +50,8 @@ def main():
         t += dt
         ind += 1
         updateTimeClock(windObj1, relclockObj1, t)
-        if ind % 100 == 0:
-            windObj1.center = (electron1.p[0], electron1.p[1], electron1.p[2])
+        #if ind % 100 == 0:
+            #windObj1.center = (electron1.p[0], electron1.p[1], electron1.p[2])
     
     while True:
         FPSrate(30)
