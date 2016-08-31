@@ -9,6 +9,9 @@ Additionally, some code is written in C to optimize a few computationally intens
 ## Compatibility
 MagBottlePy is compatible with all flavors of Python, OS platforms (Darwin is untested, but should work), and 32/64 bit architectures as long as you don't need to visualize the results.  If visualization is desired, at the moment, there must be a version of VPython 5 or 6 available to Python.  This means Python 3 is out on all platforms, as well as VPython visualization on Linux (to the knowledge of the author at the time of writing), unfortunately.  Perhaps other visualization engines will be examined in the future and will be added.  We'll see.
 
+## Dependencies
+SciPy, NumPy, [VPython (aka Visual) AND/OR PyOpenGL] (see above - Compatibility)
+
 ## Getting Started
 
 #### Download Repository
@@ -47,53 +50,19 @@ Use as is or compile the C optimizations (instructions below).
 * Mac OS X
 Untested
 
+#### Run an example
+
+Open your favorite Python IDE and run from there, or
+
+```
+cd examples
+python 1eInDualWireLoop.py
+```
+
 ## Classes and functions: A brief documentation
 
-Of course, this documentation will assume a working knowledge of Python.  Any arguments defined as ```argument=something``` are optional.
-
-### Classes
-
-#### BField
-```
-BField(windObj, BObjList=[], PartList=[])
-```
-*Define a Magnetic Field Object with the below arguments, variables, and methods.  Multiple can be defined in one program, allowing for simultaneous execution of non-interacting fields (could be useful for comparing two fields side by side).*
-
-* Use
-
-  ```
-  *someVariable* = BField(windObj, BObjList=[*someList*], PartList=[*someList*])
-  ```
-
-* Arguments (\_\_init\_\_)
-
-  1. ```windObj``` is a reference to the object that represents the window you want to draw to.  If using MagBottlePy in a purely computational way (no visualization is desired), set this to None.
-  2. ```BObjList``` is a list of Magnetic Field producing objects.  This list is iterated over in the TotalBatP method.
-  3. ```PartList``` is a list of particles placed in the magnetic field.  These objects may also produce a magnetic field (such as the included classes: electrons, protons, and positrons).
+See ClassesAndFunctions.md
   
-* Returns (\_\_init\_\_)
-  *No Returns*
-
-* Internal variables
-
-  1. windObj - see above
-  2. BObjList - see above
-  3. particleList - see above ```PartList```
-  
-* Methods
-
-  ```
-  totalBatP(p)
-  ```
-  
-  *Calculate the magnetic field at a point, ```p```, due to all objects in BObjList and particleList.  ```p``` is defined as a tuple or list of three values: [x position, y position, z position].  Returns a list of x, y, and z values of a vector representing the B field in the form [Bx, By, Bz].*
-  
-  ```
-  drawBlines(self, windObj, p, pupbound=[None,None,None], plobound=[None,None,None], numiter=None, linelength=None, multlng=None)
-  ```
-  
-  *Calculate and draw B field lines starting at a point ```p``` represented as a list or tuple of three values: [x position, y position, z position].  ```[pup|plo]bound``` represents the x,y,z values of the upper|lower bounds.  ```numiter``` allows for the specification of a number of iterations instead of a bound.  ```linelength``` allows specification of a length of B Field line instead of a bound or number of iterations.  ```multlng``` allows for scaling the B vector by a constant.*
-
 ## Extending the functionality of MagBottlePy
 
 #### Adding additional B Field producing elements
