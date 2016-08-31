@@ -13,9 +13,9 @@ BField(windObj, BObjList=[], PartList=[])
 * Use
 
   ```
-  *someVariable* = BField(windObj, BObjList=[*someList*], PartList=[*someList*])
-  *someVariable*.totalBatP(p)
-  *someVariable*.drawBlines(windObj, p, pupbound=[None,None,None], plobound=[None,None,None], numiter=None, linelength=None, multlng=None)
+  someVariable = BField(windObj, BObjList=[*someList*], PartList=[*someList*])
+  someVariable.totalBatP(p)
+  someVariable.drawBlines(windObj, p, pupbound=[None,None,None], plobound=[None,None,None], numiter=None, linelength=None, multlng=None)
   ```
 
 * Arguments (\_\_init\_\_)
@@ -58,12 +58,12 @@ Proton(windObj, po, vo)
 * Use
 
   ```
-  *someVariable* = Particle(windObj, charge, mass, [pox,poy,poz], [vox,voy,voz]) OR Electron|Positron|Proton(windObj, [pox,poy,poz], [vox,voy,voz])
-  *someVariable*.initDraw(intrvl, traillng, Dcolor=(#R,#G,#B)
-  *someVariable*.updDraw()
-  *someVariable*.calcBatP(pB)
-  *someVariable*.updP(b, dt)
-  *someVariable*.foRKvCrossB(BFieldObj, h)
+  someVariable = Particle(windObj, charge, mass, [pox,poy,poz], [vox,voy,voz]) OR Electron|Positron|Proton(windObj, [pox,poy,poz], [vox,voy,voz])
+  someVariable.initDraw(intrvl, traillng, Dcolor=(#R,#G,#B)
+  someVariable.updDraw()
+  someVariable.calcBatP(pB)
+  someVariable.updP(b, dt)
+  someVariable.foRKvCrossB(BFieldObj, h)
   ```
 
 * Arguments (\_\_init\_\_)
