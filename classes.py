@@ -131,7 +131,8 @@ class Particle(object):
             k4[1]) / 6, (k1[2] + 2 * (k2[2] + k3[2]) + k4[2]) / 6]
         
         self.v = [self.v[0] + k[0], self.v[1] + k[1], self.v[2] + k[2]]
-        self.p = [pp[0] + vv[0] * h, pp[1] + vv[1] * h, pp[2] + vv[2] * h]
+        self.p = [self.p[0] + self.v[0] * h, self.p[1] + self.v[1] * h, self.p[2] + 
+            self.v[2] * h]
         
         #B2 = BFieldObj.totalBatP(self.p + np.array(self.v) * h / 2)
         #k11 = self.eom * np.cross(self.v,BFieldObj.totalBatP(self.p)) * h
@@ -171,18 +172,17 @@ class WireCoilPair(object):
     - Distance of center of loop from origin: d [cm]
     
     Note: This builds a pair of coils, parallel to one another, offset from the origin by a distance d.  There is no way to build a single wire loop, or to have the loops offset from one another.  Hence the name 'Wire Coil Pair'"""
-    def __init__(self, windObj, Cpair, axis, N, I, R, d, name=None):
+    def __init__(self, windObj, Cpair, axis, N, I, R, d, useC=False, name=None):
         """Initiate a WireCoilPair object."""
         self.wind = windObj
-        #self.Cpair = np.array(Cpair)
         self.Cpair = Cpair
-        #self.axis = np.array(axis)
         self.axis = axis
         self.N = N; self.I = I; self.R = R; self.d = d
         self.name = name
         self.cst = float(self.N * self.I * 10**(-5))
         self.pic = None
-        
+        self.useC = useC
+                
         if self.axis[0] != 0 and self.axis[1] == 0 and self.axis[2] == 0:
             #X axis - no rotation, don't run code that's not necessary
             self.axiscf_theta = self.axiscf_phi = self.axis_phi = 0
@@ -265,7 +265,7 @@ class WireCoilPair(object):
             
         return rotateVector([bx,by,bz], self.axiscf_theta, self.axiscf_phi)
     
-    def calcBatP(self, p):
+    def calcBatPinPy(self, p):
         """Calculate the B field as a result of the wire coils at a position P."""
         pcnt = [p[0] - self.Cpair[0], p[1] - self.Cpair[1], p[2] - self.Cpair[2]]
         ppr = rotateVector(pcnt, -self.axiscf_theta, -self.axiscf_phi)
@@ -308,6 +308,11 @@ class WireCoilPair(object):
             return bx, by, bz
             
         return rotateVector([bx,by,bz], self.axiscf_theta, self.axiscf_phi)
+    
+    def calcBatP(self, p):
+        if self.useC == True:
+            return self.calcBatPinC(p)
+        return self.calcBatPinPy(p)
 
 class BField(object):
     """Define a B Field object containing the elements in BObjList."""
