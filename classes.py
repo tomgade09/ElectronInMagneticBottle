@@ -248,23 +248,17 @@ class WireCoilPair(object):
         numProc = 2
         pool = mp.Pool(processes=numProc)
         
-        xIntQuad = partial(integrate.quad, lib.dBx, 0, 2*pi)
-        yIntQuad = partial(integrate.quad, lib.dBy, 0, 2*pi)
-        zIntQuad = partial(integrate.quad, lib.dBz, 0, 2*pi)
+        #xIntQuad = partial(integrate.quad, lib.dBx, 0, 2*pi)
+        #yIntQuad = partial(integrate.quad, lib.dBy, 0, 2*pi)
+        #zIntQuad = partial(integrate.quad, lib.dBz, 0, 2*pi)
         
-        #BnProc = pool.map(integrate.quad,[lib.dBx, lib.dBy, lib.dBz, lib.dBx, lib.dBy, lib.dBz],[0, 0, 0, 0, 0, 0],[2*pi, 2*pi, 2*pi, 2*pi, 2*pi, 2*pi],
-        #[(c1, c2, c3, c4lf, c5, c6),(c7lf, c4lf, c5, c6),(c7lf, c4lf, c5, c6),
-        #(c1, c2, c3, c4rt, c5, c6),(c7rt, c4rt, c5, c6),(c7rt, c4rt, c5, c6)])
+        print(type(lib.dBx))
         
-        BxProc = pool.map(xIntQuad,
-            [(c1, c2, c3, c4lf, c5, c6),(c1, c2, c3, c4rt, c5, c6)])
-        ByProc = pool.map(yIntQuad,[(c7lf, c4lf, c5, c6),(c7rt, c4rt, c5, c6)])
-        BzProc = pool.map(zIntQuad,[(c7lf, c4lf, c5, c6),(c7rt, c4rt, c5, c6)])
+        BnProc = pool.map(integrate.quad, [(lib.dBx, 0, 2*pi, (c1, c2, c3, c4lf, c5, c6)),(lib.dBy, 0, 2*pi, (c7lf, c4lf, c5, c6)), (lib.dBz, 0, 2*pi, (c7lf, c4lf, c5, c6)), (lib.dBx, 0, 2*pi, (c1, c2, c3, c4rt, c5, c6)), (lib.dBy, 0, 2*pi, (c7rt, c4rt, c5, c6)), (lib.dBz, 0, 2*pi, (c7rt, c4rt, c5, c6))])
+        
         print(pool)
         pool.close()
         pool.join()
-        
-        BnProc = [BxProc[0],ByProc[0],BzProc[0],BxProc[1],ByProc[1],BzProc[1]]
         print(BnProc)
         
         lfBx = integrate.quad(lib.dBx, 0, 2*pi, 
@@ -317,6 +311,29 @@ class WireCoilPair(object):
             self.d)**2 + (ppr[1] - self.R*cos(a))**2 + (ppr[2] -
             self.R*sin(a))**2)**(3/2))
     
+        import multiprocessing as mp
+        from functools import partial
+        numProc = 2
+        pool = mp.Pool(processes=numProc)
+        
+        #BxProc = []
+        #Seems like lambda functions need to be defined at top level. Not sure what to do
+        BxProc = pool.map(integrate.quad, [(lfdBx,0,2*pi),(lfdBy,0,2*pi),(lfdBz,0,2*pi),
+            (rtdBx,0,2*pi),(rtdBy,0,2*pi),(rtdBz,0,2*pi)])
+        
+        #def appendans(ans):
+            #BxProc.append(ans)
+            #print("Appended: %s", ans)
+        
+        #for i in [lfdBx, lfdBy, lfdBz, rtdBx, rtdBy, rtdBz]:
+            #pool.apply_async(integrate.quad, args=(i, 0, 2*pi), callback=appendans)
+        pool.close()
+        pool.join()
+        
+        print(pool)
+        
+        print(BxProc)
+    
         # Integrate Functions Iteratively
         lfBx = integrate.quad(lfdBx, 0, 2*pi)
         lfBy = integrate.quad(lfdBy, 0, 2*pi)
@@ -324,7 +341,8 @@ class WireCoilPair(object):
         rtBx = integrate.quad(rtdBx, 0, 2*pi)
         rtBy = integrate.quad(rtdBy, 0, 2*pi)
         rtBz = integrate.quad(rtdBz, 0, 2*pi)
-
+        print([lfBx, lfBy, lfBz, rtBx, rtBy, rtBz])
+        
         # Find total B
         bx = lfBx[0] + rtBx[0]
         by = lfBy[0] + rtBy[0]
