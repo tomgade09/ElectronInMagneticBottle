@@ -22,14 +22,14 @@ def main():
     loopaxis = [1,0,0]
 
     # Draw some things
-    windObj1 = drawWindow(1920, 1080, e1center)
-    relclockObj1 = drawTimeClock(windObj1, [-6.5,0,0], t)
-    
-    wireCoils = WireCoilPair(windObj1, wccenter, loopaxis, 1, 1, 5, 5)
-    wireCoils.initDraw()
+    #windObj1 = drawWindow(1920, 1080, e1center)
+    #relclockObj1 = drawTimeClock(windObj1, [-6.5,0,0], t)
+    windObj1 = None
+    wireCoils = WireCoilPair(windObj1, wccenter, loopaxis, 1, 1, 5, 5, useC=True)
+    #wireCoils.initDraw()
     
     electron1 = Electron(windObj1, e1center, e1vel)
-    electron1.initDraw(10, 50)
+    #electron1.initDraw(10, 50)
     
     B = BField(None)
     B.BObjList.append(wireCoils)
@@ -47,10 +47,10 @@ def main():
         FPSrate(10000)
         
         electron1.foRKvCrossB(B,dt)
-        electron1.updDraw()
+        #electron1.updDraw()
         t += dt
         ind += 1
-        updateTimeClock(windObj1, relclockObj1, t)
+        #updateTimeClock(windObj1, relclockObj1, t)
         if ind % 1000 == 0:
             #windObj1.center = (electron1.p[0], electron1.p[1], electron1.p[2])
             print(ind, time.time() - start)

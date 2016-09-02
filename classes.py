@@ -243,6 +243,30 @@ class WireCoilPair(object):
         c7lf = self.cst * self.R * (ppr[0] + self.d)
         c7rt = self.cst * self.R * (ppr[0] - self.d)
         
+        import multiprocessing as mp
+        from functools import partial
+        numProc = 2
+        pool = mp.Pool(processes=numProc)
+        
+        xIntQuad = partial(integrate.quad, lib.dBx, 0, 2*pi)
+        yIntQuad = partial(integrate.quad, lib.dBy, 0, 2*pi)
+        zIntQuad = partial(integrate.quad, lib.dBz, 0, 2*pi)
+        
+        #BnProc = pool.map(integrate.quad,[lib.dBx, lib.dBy, lib.dBz, lib.dBx, lib.dBy, lib.dBz],[0, 0, 0, 0, 0, 0],[2*pi, 2*pi, 2*pi, 2*pi, 2*pi, 2*pi],
+        #[(c1, c2, c3, c4lf, c5, c6),(c7lf, c4lf, c5, c6),(c7lf, c4lf, c5, c6),
+        #(c1, c2, c3, c4rt, c5, c6),(c7rt, c4rt, c5, c6),(c7rt, c4rt, c5, c6)])
+        
+        BxProc = pool.map(xIntQuad,
+            [(c1, c2, c3, c4lf, c5, c6),(c1, c2, c3, c4rt, c5, c6)])
+        ByProc = pool.map(yIntQuad,[(c7lf, c4lf, c5, c6),(c7rt, c4rt, c5, c6)])
+        BzProc = pool.map(zIntQuad,[(c7lf, c4lf, c5, c6),(c7rt, c4rt, c5, c6)])
+        print(pool)
+        pool.close()
+        pool.join()
+        
+        BnProc = [BxProc[0],ByProc[0],BzProc[0],BxProc[1],ByProc[1],BzProc[1]]
+        print(BnProc)
+        
         lfBx = integrate.quad(lib.dBx, 0, 2*pi, 
             args=(c1, c2, c3, c4lf, c5, c6))
         lfBy = integrate.quad(lib.dBy, 0, 2*pi, 
@@ -255,6 +279,8 @@ class WireCoilPair(object):
             args=(c7rt, c4rt, c5, c6))
         rtBz = integrate.quad(lib.dBz, 0, 2*pi, 
             args=(c7rt, c4rt, c5, c6))
+        
+        print([lfBx, lfBy, lfBz, rtBx, rtBy, rtBz])
         
         bx = lfBx[0] + rtBx[0]
         by = lfBy[0] + rtBy[0]
