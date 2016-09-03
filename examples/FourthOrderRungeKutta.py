@@ -25,7 +25,7 @@ def main():
     #windObj1 = drawWindow(1920, 1080, e1center)
     #relclockObj1 = drawTimeClock(windObj1, [-6.5,0,0], t)
     windObj1 = None
-    wireCoils = WireCoilPair(windObj1, wccenter, loopaxis, 1, 1, 5, 5, useC=False)
+    wireCoils = WireCoilPair(windObj1, wccenter, loopaxis, 1, 1, 5, 5, useC=True)
     #wireCoils.initDraw()
     
     electron1 = Electron(windObj1, e1center, e1vel)

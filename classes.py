@@ -218,7 +218,7 @@ class WireCoilPair(object):
         """Draw the pair of Wire Coils."""
         self.pic = drawWireCoilPair(self.wind, self.Cpair, self.axis, self.Cleft,
             self.Cright, self.R)
-    
+    @profile
     def calcBatPinC(self, p):
         """Calculate the B field as a result of the wire coils at a position P."""
         pcnt = [p[0] - self.Cpair[0], p[1] - self.Cpair[1], p[2] - self.Cpair[2]]
@@ -244,22 +244,37 @@ class WireCoilPair(object):
         c7rt = self.cst * self.R * (ppr[0] - self.d)
         
         import multiprocessing as mp
-        from functools import partial
-        numProc = 2
-        pool = mp.Pool(processes=numProc)
-        
+        #from functools import partial
         #xIntQuad = partial(integrate.quad, lib.dBx, 0, 2*pi)
         #yIntQuad = partial(integrate.quad, lib.dBy, 0, 2*pi)
         #zIntQuad = partial(integrate.quad, lib.dBz, 0, 2*pi)
         
-        print(type(lib.dBx))
+        #numProc = 2
+        #pool = mp.Pool(processes=numProc)
+        queue = mp.Queue()
+        jobs = []
+            
+        prociter = [[True,False,False,(c1, c2, c3, c4lf, c5, c6),"lfBx"],
+            [False,True,False,(c7lf, c4lf, c5, c6),"lfBy"],
+            [False,False,True,(c7lf, c4lf, c5, c6),"lfBz"],
+            [True,False,False,(c1, c2, c3, c4rt, c5, c6),"rtBx"],
+            [False,True,False,(c7rt, c4rt, c5, c6),"rtBy"],
+            [False,False,True,(c7rt, c4rt, c5, c6),"rtBz"]]
         
-        BnProc = pool.map(integrate.quad, [(lib.dBx, 0, 2*pi, (c1, c2, c3, c4lf, c5, c6)),(lib.dBy, 0, 2*pi, (c7lf, c4lf, c5, c6)), (lib.dBz, 0, 2*pi, (c7lf, c4lf, c5, c6)), (lib.dBx, 0, 2*pi, (c1, c2, c3, c4rt, c5, c6)), (lib.dBy, 0, 2*pi, (c7rt, c4rt, c5, c6)), (lib.dBz, 0, 2*pi, (c7rt, c4rt, c5, c6))])
+        for i in prociter:
+            p = mp.Process(target=mpIntegrate, args=(queue,i[0],i[1],i[2],i[3],i[4]))
+            jobs.append(p)
+            p.start()
         
-        print(pool)
-        pool.close()
-        pool.join()
-        print(BnProc)
+        data=[]
+        for p in jobs:
+            data.append(queue.get())
+        
+        #print(data)
+        
+        #BnProc = pool.map(integrate.quad, [(lib.dBx, 0, 2*pi, (c1, c2, c3, c4lf, c5, c6)), (lib.dBy, 0, 2*pi, (c7lf, c4lf, c5, c6)), (lib.dBz, 0, 2*pi, (c7lf, c4lf, c5, c6)), (lib.dBx, 0, 2*pi, (c1, c2, c3, c4rt, c5, c6)), (lib.dBy, 0, 2*pi, (c7rt, c4rt, c5, c6)), (lib.dBz, 0, 2*pi, (c7rt, c4rt, c5, c6))])
+        
+        #print(BnProc)
         
         lfBx = integrate.quad(lib.dBx, 0, 2*pi, 
             args=(c1, c2, c3, c4lf, c5, c6))
@@ -274,7 +289,8 @@ class WireCoilPair(object):
         rtBz = integrate.quad(lib.dBz, 0, 2*pi, 
             args=(c7rt, c4rt, c5, c6))
         
-        print([lfBx, lfBy, lfBz, rtBx, rtBy, rtBz])
+        #print([["lfBx",lfBx], ["lfBy",lfBy], ["lfBz",lfBz], ["rtBx",rtBx], ["rtBy",rtBy], ["rtBz",rtBz]])
+        print("===========")
         
         bx = lfBx[0] + rtBx[0]
         by = lfBy[0] + rtBy[0]
@@ -407,3 +423,25 @@ class BField(object):
             
             drawLine(self.windObj, p, [bx,by,bz])
             p[0] += bx; p[1] += by; p[2] += bz
+            
+def mpIntegrate(q, BxInt, ByInt, BzInt, intargs, BName):
+    if int(BxInt) + int(ByInt) + int(BzInt) != 1:
+        print("Err: Set exactly one of {Bx|By|Bz}Int to True.  Aborting B calc.")
+        return
+    
+    lib = ctypes.CDLL(libFilePath)
+    
+    if BxInt == True:
+        lib.dBx.restype = ctypes.c_double
+        lib.dBx.argtypes = (ctypes.c_int, ctypes.c_double)
+        BInteg = integrate.quad(lib.dBx, 0, 2*pi, args=intargs)
+    elif ByInt == True:
+        lib.dBy.restype = ctypes.c_double
+        lib.dBy.argtypes = (ctypes.c_int, ctypes.c_double)
+        BInteg = integrate.quad(lib.dBy, 0, 2*pi, args=intargs)
+    elif BzInt == True:
+        lib.dBz.restype = ctypes.c_double
+        lib.dBz.argtypes = (ctypes.c_int, ctypes.c_double)
+        BInteg = integrate.quad(lib.dBz, 0, 2*pi, args=intargs)
+    
+    q.put([BName, BInteg])
