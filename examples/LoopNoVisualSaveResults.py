@@ -62,10 +62,10 @@ def main(deltat,foldstring,usec):
     return [deltat, tottime, float(usec)]
 
 if __name__ == "__main__":
-    fstr = './../__TestResults__/TestNewC/'
+    fstr = './../__TestResults__/MPTest/Yes/'
     timed = []
     #timed.append(main(1e-8,fstr,False))
-    timed.append(main(1e-10,fstr,True))
+    timed.append(main(1e-9,fstr,True))
     #for j in range(-9,-10,-1):
         #for i in [1]:
             #timed.append(main(i*(10**j),fstr,True))

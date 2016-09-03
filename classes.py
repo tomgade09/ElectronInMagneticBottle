@@ -268,7 +268,15 @@ class WireCoilPair(object):
         
         data=[]
         for p in jobs:
+            p.join()
+            
+        for p in jobs:
             data.append(queue.get())
+        
+        data = sorted(data, key=lambda x: x[0])
+        bx = data[0][1][0] + data[3][1][0]
+        by = data[1][1][0] + data[4][1][0]
+        bz = data[2][1][0] + data[5][1][0]
         
         #print(data)
         
@@ -276,25 +284,25 @@ class WireCoilPair(object):
         
         #print(BnProc)
         
-        lfBx = integrate.quad(lib.dBx, 0, 2*pi, 
-            args=(c1, c2, c3, c4lf, c5, c6))
-        lfBy = integrate.quad(lib.dBy, 0, 2*pi, 
-            args=(c7lf, c4lf, c5, c6))
-        lfBz = integrate.quad(lib.dBz, 0, 2*pi, 
-            args=(c7lf, c4lf, c5, c6))
-        rtBx = integrate.quad(lib.dBx, 0, 2*pi, 
-            args=(c1, c2, c3, c4rt, c5, c6))
-        rtBy = integrate.quad(lib.dBy, 0, 2*pi, 
-            args=(c7rt, c4rt, c5, c6))
-        rtBz = integrate.quad(lib.dBz, 0, 2*pi, 
-            args=(c7rt, c4rt, c5, c6))
+        #lfBx = integrate.quad(lib.dBx, 0, 2*pi, 
+            #args=(c1, c2, c3, c4lf, c5, c6))
+        #lfBy = integrate.quad(lib.dBy, 0, 2*pi, 
+            #args=(c7lf, c4lf, c5, c6))
+        #lfBz = integrate.quad(lib.dBz, 0, 2*pi, 
+            #args=(c7lf, c4lf, c5, c6))
+        #rtBx = integrate.quad(lib.dBx, 0, 2*pi, 
+            #args=(c1, c2, c3, c4rt, c5, c6))
+        #rtBy = integrate.quad(lib.dBy, 0, 2*pi, 
+            #args=(c7rt, c4rt, c5, c6))
+        #rtBz = integrate.quad(lib.dBz, 0, 2*pi, 
+            #args=(c7rt, c4rt, c5, c6))
         
         #print([["lfBx",lfBx], ["lfBy",lfBy], ["lfBz",lfBz], ["rtBx",rtBx], ["rtBy",rtBy], ["rtBz",rtBz]])
-        print("===========")
+        #print("===========")
         
-        bx = lfBx[0] + rtBx[0]
-        by = lfBy[0] + rtBy[0]
-        bz = lfBz[0] + rtBz[0]
+        #bx = lfBx[0] + rtBx[0]
+        #by = lfBy[0] + rtBy[0]
+        #bz = lfBz[0] + rtBz[0]
         
         if self.axiscf_theta == 0 and self.axiscf_phi == 0:
             return bx, by, bz
