@@ -8,8 +8,8 @@ os.chdir(a)
 
 from classes import *
 # Only use one of these at a time to avoid namespace conflicts
-from VPyDraw import *
-#from OpenGLDraw import *
+#from VPyDraw import *
+from OpenGLDraw import *
 
 def main():
     ind = 0                            #Index (Calculation Counter)
