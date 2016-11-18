@@ -1,3 +1,4 @@
+from classes import *
 from visual import *
 
 def drawWindow(wd, ht, cent, axistype="points"):
@@ -79,3 +80,62 @@ def keyInput(evt):
 
 def inputHandler():
     scene.bind('keydown', keyInput)
+    
+#Methods for "Particle" Class
+def PinitDraw(self, intrvl, traillng, Dcolor=(0,1,0)):
+    """Draw a point object representing the particle in the object specified by self.wind.  intrvl represents how often to 'draw' a point.  traillng represents how long of a 'trail' to leave behind the current position of the particle."""
+    if self.pic is not None:
+        print("Pic has already been initialized. Use updDraw to change the position.")
+        return
+    self.pic = drawParticlePic(self.wind, self.p, intrvl, traillng, Dcolor)
+    return self.pic
+        
+def PupdDraw(self):
+    """Update the location of the point object drawn with initDraw.  Obviously, it can't be updated if it hasn't been initialized.  Use the initDraw function first."""
+    if self.pic is None:
+        print("Pic has not been initialized.  Use initDraw to create a picture of the particle first.")
+        return
+    updateParticlePic(self.wind, self.pic, self.p)
+
+Particle.initDraw = PinitDraw
+Particle.updDraw = PupdDraw
+
+#Methods for "WireCoilPair" Class
+def WCinitDraw(self):
+    """Draw the pair of Wire Coils."""
+    self.pic = drawWireCoilPair(self.wind, self.Cpair, self.axis, self.Cleft,
+        self.Cright, self.R)
+
+WireCoilPair.initDraw = WCinitDraw
+        
+#Methods for "BField" Class
+def drawBlines(self, p, pupbound=[None,None,None], plobound=[None,None,None], 
+    numiter=None, linelength=None, multlng=None):
+    """Draw B field lines starting at po and ending at ####."""
+    loopind = 0
+    BoundBool = True
+    while BoundBool:
+        for i in [pupbound, plobound]:
+            #ToDo Write code to check lower bound - maybe negative both sides
+            if i[0] is not None:
+                BoundBool = BoundBool and p[0] <= i[0]
+            if i[1] is not None:
+                BoundBool = BoundBool and p[1] <= i[1]
+            if i[2] is not None:
+                BoundBool = BoundBool and p[2] <= i[2]
+        if numiter is not None:
+            loopind += 1
+            BoundBool = BoundBool and loopind < numiter
+            
+        bx, by, bz = self.totalBatP(p)
+            
+        if linelength is not None:
+            Blen, Bth, Bphi = cartesianToSpherical([bx,by,bz])
+            bx, by, bz = sphericalToCartesian(linelength, Bth, Bphi)
+        elif multlng is not None:
+            bx *= multlng; by *= multlng; bz *= multlng
+            
+        drawLine(self.windObj, p, [bx,by,bz])
+        p[0] += bx; p[1] += by; p[2] += bz
+        
+BField.drawBlines = drawBlines

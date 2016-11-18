@@ -5,11 +5,7 @@ a = os.path.dirname(os.path.abspath(inspect.getsourcefile(lambda:0)))
 sys.path.append(a + '/../')
 sys.path.append(a + '/../vis/')
 
-from classes import *
-# Only use one of these at a time to avoid namespace conflicts
 from VPyDraw import *
-#from pygletDraw import *
-#from OpenGLDraw import *
 
 def main():
     ind = 0                            #Index (Calculation Counter)
@@ -41,11 +37,11 @@ def main():
     B.BObjList.append(electron1)
     B.BObjList.append(electron2)
     #Needs a test
-    for i in [[-5,0,-3.5],[-5,-3.5,0],[-5,0,3.5],[-5,3.5,0]]:
-        j = rotateVector(i,wireCoils.axis_theta,wireCoils.axis_phi)
-        j += wireCoils.Cpair
-        k = sphericalToCartesian(2*wireCoils.d,wireCoils.axis_theta,wireCoils.axis_phi)
-        B.drawBlines(windObj1, j, pupbound=k, multlng=10000)
+    #for i in [[-5,0,-3.5],[-5,-3.5,0],[-5,0,3.5],[-5,3.5,0]]:
+        #j = rotateVector(i,wireCoils.axis_theta,wireCoils.axis_phi)
+        #j += wireCoils.Cpair
+        #k = sphericalToCartesian(2*wireCoils.d,wireCoils.axis_theta,wireCoils.axis_phi)
+        #B.drawBlines(j, pupbound=k, multlng=10000)
     
     while ((-10 + wccenter[0]) <= electron1.p[0] <= (10 + wccenter[0])) and ((-10 + 
             wccenter[1]) <= electron1.p[1] <= (10 + wccenter[1])) and ((-10 + 

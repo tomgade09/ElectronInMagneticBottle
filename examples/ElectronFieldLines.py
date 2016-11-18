@@ -5,7 +5,6 @@ a = os.path.dirname(os.path.abspath(inspect.getsourcefile(lambda:0)))
 sys.path.append(a + '/../')
 sys.path.append(a + '/../vis/')
 
-from classes import *
 from VPyDraw import *
 
 windObj1 = drawWindow(1920, 1080, [0,0,0], axistype="lines")
@@ -19,12 +18,12 @@ drawLine(windObj1, [0.5,0.5,0.5], [0.5,0.5,0.5], shaftwd=0.05, headwd=0.1, headl
 label(pos=[0.5,1,1],text='v')
 
 FPSrate(30)
-B.drawBlines(windObj1, [0.11,0.1,0.1], numiter=100, multlng=1e16)
-B.drawBlines(windObj1, [0.09,0.1,0.1], numiter=100, multlng=1e16)
-B.drawBlines(windObj1, [0.1,0.11,0.1], numiter=100, multlng=1e16)
-B.drawBlines(windObj1, [0.1,0.09,0.1], numiter=100, multlng=1e16)
-B.drawBlines(windObj1, [0.1,0.1,0.11], numiter=100, multlng=1e16)
-B.drawBlines(windObj1, [0.1,0.1,0.09], numiter=100, multlng=1e16)
+B.drawBlines([0.11,0.1,0.1], numiter=100, multlng=1e16)
+B.drawBlines([0.09,0.1,0.1], numiter=100, multlng=1e16)
+B.drawBlines([0.1,0.11,0.1], numiter=100, multlng=1e16)
+B.drawBlines([0.1,0.09,0.1], numiter=100, multlng=1e16)
+B.drawBlines([0.1,0.1,0.11], numiter=100, multlng=1e16)
+B.drawBlines([0.1,0.1,0.09], numiter=100, multlng=1e16)
 
 print("done")
 

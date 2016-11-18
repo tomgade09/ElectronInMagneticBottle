@@ -1,8 +1,8 @@
 from __future__ import division,print_function
 
 # Import visual library.  Only use one of these at a time to avoid namespace conflicts.
-from VPyDraw import *
-#from OpenGLDraw import *
+#from VPyDraw import *
+#from OpenGLDraw import * #Only use for MinVR - Virtual Reality Display
 
 from scipy import integrate
 from math import *
@@ -45,21 +45,6 @@ class Particle(object):
         self.name = name
         self.eom = self.q / self.mass
         self.pic = None
-
-    def initDraw(self, intrvl, traillng, Dcolor=(0,1,0)):
-        """Draw a point object representing the particle in the object specified by self.wind.  intrvl represents how often to 'draw' a point.  traillng represents how long of a 'trail' to leave behind the current position of the particle."""
-        if self.pic is not None:
-            print("Pic has already been initialized. Use updDraw to change the position.")
-            return
-        self.pic = drawParticlePic(self.wind, self.p, intrvl, traillng, Dcolor)
-        return self.pic
-        
-    def updDraw(self):
-        """Update the location of the point object drawn with initDraw.  Obviously, it can't be updated if it hasn't been initialized.  Use the initDraw function first."""
-        if self.pic is None:
-            print("Pic has not been initialized.  Use initDraw to create a picture of the particle first.")
-            return
-        updateParticlePic(self.wind, self.pic, self.p)
     
     def calcBatP(self, pB):
         """Calculate B at a point pB due to this particle."""
@@ -110,7 +95,7 @@ class Particle(object):
     # Two methods execute at similar speeds - in Py2.7, top executes about 5% faster
     # In Py 3.5, top executes about 10% slower
     # Not exactly sure what to pick
-    # Even with MKL on a Core2Duo, numpy is slower - not sure about newer procs
+    # Even with MKL on a Core2Duo, numpy(bottom) is slower - not sure about newer procs
         B1 = BFieldObj.totalBatP(self.p[:])
         P23 = [self.p[0] + self.v[0] * h / 2, self.p[1] + self.v[1] * h / 2, self.p[2] + 
             self.v[2] * h / 2]
@@ -213,11 +198,6 @@ class WireCoilPair(object):
                 self.Cright[2] + self.Cpair[2]]
             self.Cleft = [self.Cleft[0] + self.Cpair[0], self.Cleft[1] + self.Cpair[1],
                 self.Cleft[2] + self.Cpair[2]]
-
-    def initDraw(self):
-        """Draw the pair of Wire Coils."""
-        self.pic = drawWireCoilPair(self.wind, self.Cpair, self.axis, self.Cleft,
-            self.Cright, self.R)
     
     def calcBatPinC(self, p):
         """Calculate the B field as a result of the wire coils at a position P."""
@@ -334,32 +314,3 @@ class BField(object):
             Bx += bx; By += by; Bz += bz
         
         return [Bx, By, Bz]
-    
-    def drawBlines(self, p, pupbound=[None,None,None],
-        plobound=[None,None,None], numiter=None, linelength=None, multlng=None):
-        """Draw B field lines starting at po and ending at ####."""
-        loopind = 0
-        BoundBool = True
-        while BoundBool:
-            for i in [pupbound, plobound]:
-                #ToDo Write code to check lower bound - maybe negative both sides
-                if i[0] is not None:
-                    BoundBool = BoundBool and p[0] <= i[0]
-                if i[1] is not None:
-                    BoundBool = BoundBool and p[1] <= i[1]
-                if i[2] is not None:
-                    BoundBool = BoundBool and p[2] <= i[2]
-            if numiter is not None:
-                loopind += 1
-                BoundBool = BoundBool and loopind < numiter
-            
-            bx, by, bz = self.totalBatP(p)
-            
-            if linelength is not None:
-                Blen, Bth, Bphi = cartesianToSpherical([bx,by,bz])
-                bx, by, bz = sphericalToCartesian(linelength, Bth, Bphi)
-            elif multlng is not None:
-                bx *= multlng; by *= multlng; bz *= multlng
-            
-            drawLine(self.windObj, p, [bx,by,bz])
-            p[0] += bx; p[1] += by; p[2] += bz

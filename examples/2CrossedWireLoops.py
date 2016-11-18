@@ -5,11 +5,7 @@ a = os.path.dirname(os.path.abspath(inspect.getsourcefile(lambda:0)))
 sys.path.append(a + '/../')
 sys.path.append(a + '/../vis/')
 
-from classes import *
-# Only use one of these at a time to avoid namespace conflicts
 from VPyDraw import *
-#from pygletDraw import *
-#from OpenGLDraw import *
 
 e1center = [-4.75,0,0]
 e1vel = [10000,10000,10000]
@@ -38,7 +34,7 @@ B.BObjList.append(wireCoils2)
 
 for i in [[-5,0,-3.5],[-5,-3.5,0],[-5,0,3.5],[-5,3.5,0]]:
     j = rotateVector(i,wireCoils1.axiscf_theta,wireCoils1.axiscf_phi) + wireCoils1.Cpair
-    B.drawBlines(windObj1, j, pupbound=[5,5,5], multlng=10000)
+    B.drawBlines(j, pupbound=[5,5,5], multlng=10000)
     
 while ((-10 + wccenter[0]) <= electron1.p[0] <= (10 + wccenter[0])) and ((-10 + 
         wccenter[1]) <= electron1.p[1] <= (10 + wccenter[1])) and ((-10 + 

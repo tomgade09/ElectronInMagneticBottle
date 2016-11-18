@@ -5,11 +5,7 @@ a = os.path.dirname(os.path.abspath(inspect.getsourcefile(lambda:0)))
 sys.path.append(a + '/../')
 sys.path.append(a + '/../vis/')
 
-from classes import *
-# Only use one of these at a time to avoid namespace conflicts
 from VPyDraw import *
-#from pygletDraw import *
-#from OpenGLDraw import *
 
 def main():
     ind = 0                            #Index (Calculation Counter)
