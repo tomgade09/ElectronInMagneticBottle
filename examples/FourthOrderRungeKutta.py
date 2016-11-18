@@ -44,7 +44,7 @@ def main():
     #while ((-10 + wccenter[0]) <= electron1.p[0] <= (10 + wccenter[0])) and ((-10 + 
             #wccenter[1]) <= electron1.p[1] <= (10 + wccenter[1])) and ((-10 + 
             #wccenter[2]) <= electron1.p[2] <= (10 + wccenter[2])):
-        FPSrate(10000)
+        #FPSrate(10000)
         
         electron1.foRKvCrossB(B,dt)
         #electron1.updDraw()
@@ -56,7 +56,7 @@ def main():
             print(ind, time.time() - start)
     
     while True:
-        FPSrate(30)
+        #FPSrate(30)
 
 if __name__ == "__main__":
     main()
