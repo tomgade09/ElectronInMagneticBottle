@@ -10,7 +10,7 @@ from VPyDraw import *
 def main():
     ind = 0                            #Index (Calculation Counter)
     t = 0                              #Initial time [s]
-    dt = 5*10**-8
+    dt = 5*10**-9
     
     evel = [1000,1000,1000]
     e1center = [-10.75,0,0]

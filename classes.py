@@ -1,9 +1,5 @@
 from __future__ import division,print_function
 
-# Import visual library.  Only use one of these at a time to avoid namespace conflicts.
-#from VPyDraw import *
-#from OpenGLDraw import * #Only use for MinVR - Virtual Reality Display
-
 from scipy import integrate
 from math import *
 import numpy as np
@@ -211,6 +207,22 @@ class WireCoilPair(object):
         lib.dBx.argtypes = (ctypes.c_int, ctypes.c_double)
         lib.dBy.argtypes = (ctypes.c_int, ctypes.c_double)
         lib.dBz.argtypes = (ctypes.c_int, ctypes.c_double)
+        
+        #cpp gauss_legendre test
+        #lib = ctypes.CDLL(libFilePath)
+        #lib.calcBxatP.restype = ctypes.c_double
+        #lib.calcByatP.restype = ctypes.c_double
+        #lib.calcBzatP.restype = ctypes.c_double
+        #lib.calcBxatP.argtypes = (ctypes.c_double, ctypes.c_double, ctypes.c_double, ctypes.c_double, 
+        #    ctypes.c_double, ctypes.c_double, ctypes.c_double)
+        #lib.calcByatP.argtypes = (ctypes.c_double, ctypes.c_double, ctypes.c_double, ctypes.c_double, 
+        #    ctypes.c_double, ctypes.c_double, ctypes.c_double)
+        #lib.calcBzatP.argtypes = (ctypes.c_double, ctypes.c_double, ctypes.c_double, ctypes.c_double, 
+        #    ctypes.c_double, ctypes.c_double, ctypes.c_double)
+        
+        #bx = lib.calcBxatP(p[0], p[1], p[2], self.N, self.I, self.R, self.d)
+        #by = lib.calcByatP(p[0], p[1], p[2], self.N, self.I, self.R, self.d)
+        #bz = lib.calcBzatP(p[0], p[1], p[2], self.N, self.I, self.R, self.d)
         
         c1 = -self.cst * self.R * ppr[2]
         c2 = -self.cst * self.R * ppr[1]

@@ -20,7 +20,7 @@ def main():
     loopaxis = [1,0,0]
     
     # Draw some things
-    windObj1 = drawWindow(1920, 1080, e1center)
+    windObj1 = drawWindow(1920, 1080, [0,0,0])
     relclockObj1 = drawTimeClock(windObj1, [-6.5,0,0], t)
     
     wireCoils = WireCoilPair(windObj1, wccenter, loopaxis, 1, 1, 5, 5)

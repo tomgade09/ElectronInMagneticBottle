@@ -19,7 +19,7 @@ def main():
     loopaxis = [1,0,0]
     
     # Draw some things
-    windObj1 = drawWindow(1920, 1080, e1center)
+    windObj1 = drawWindow(1920, 1080, [0,0,0])
     relclockObj1 = drawTimeClock(windObj1, [-6.5,0,0], t)
     
     wireCoils = WireCoilPair(windObj1, wccenter, loopaxis, 1, 1, 5, 5, useC=True)
@@ -32,9 +32,9 @@ def main():
     B.BObjList.append(wireCoils)
     #B.BObjList.append(electron1) #Messes with mag field lines.  Don't need for now.
     
-    #for i in [[-5,0,-3.5],[-5,-3.5,0],[-5,0,3.5],[-5,3.5,0]]:
-        #j = rotateVector(i,wireCoils.axiscf_theta,wireCoils.axiscf_phi) + wireCoils.Cpair
-        #B.drawBlines(windObj1, j, pupbound=[5,None,None], multlng=10000)
+    for i in [[-5,0,-3.5],[-5,-3.5,0],[-5,0,3.5],[-5,3.5,0]]:
+        j = rotateVector(i,wireCoils.axiscf_theta,wireCoils.axiscf_phi) + wireCoils.Cpair
+        B.drawBlines(j, pupbound=[5,None,None], multlng=10000)
     
     start = time.time()
     while ((-10 + wccenter[0]) <= electron1.p[0] <= (10 + wccenter[0])) and ((-10 + 

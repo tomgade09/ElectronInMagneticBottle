@@ -1,0 +1,35 @@
+project(WireCoilB)
+
+set (SOURCEFILES 
+  wirecoilbplusint.cpp
+  gauss_legendre.c
+)
+
+set (HEADERFILES
+  gauss_legendre.h
+)
+
+source_group("Header Files" FILES ${HEADERFILES})
+
+#------------------------------------------
+# Set output directories to lib, and bin
+#------------------------------------------
+
+#set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR})
+
+#------------------------------------------
+# Build Target
+#------------------------------------------
+
+SET(CMAKE_SKIP_BUILD_RPATH  FALSE)
+SET(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE) 
+SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+
+add_library ( ${PROJECT_NAME} SHARED ${HEADERFILES} ${SOURCEFILES} )
+
+#------------------------------------------
+# Install Target
+#------------------------------------------
+
+install( TARGETS ${PROJECT_NAME}
+         RUNTIME DESTINATION ${CMAKE_SOURCE_DIR}/../lib)

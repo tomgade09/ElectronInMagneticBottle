@@ -16,15 +16,14 @@ def sphericalToCartesian(rho, theta, phi):
     """Convert spherical coords to cartesian."""
     if theta == 0: #Z axis case
         return 0, 0, rho
-    else:
-        x = rho * sin(theta) * cos(phi)
-        y = rho * sin(theta) * sin(phi)
-        z = rho * cos(theta)
+    x = rho * sin(theta) * cos(phi)
+    y = rho * sin(theta) * sin(phi)
+    z = rho * cos(theta)
     
     return [x, y, z]
     
 def rotateVector(v, rot_theta, rot_phi):
-    """Rotate a vector, v by rot_theta and rot_phi.  You can guess which corresponds to theta and which corresponds to phi."""
+    """Rotate a cartesian vector, v by rot_theta and rot_phi.  You can guess which corresponds to theta and which corresponds to phi."""
     if rot_theta == -pi / 2: #Z axis case
         xprm = - v[2]; yprm = v[1]; zprm = v[0]
         return xprm, yprm, zprm

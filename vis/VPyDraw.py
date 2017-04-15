@@ -114,6 +114,7 @@ def drawBlines(self, p, pupbound=[None,None,None], plobound=[None,None,None],
     """Draw B field lines starting at po and ending at ####."""
     loopind = 0
     BoundBool = True
+    pts=[]
     while BoundBool:
         for i in [pupbound, plobound]:
             #ToDo Write code to check lower bound - maybe negative both sides
@@ -135,7 +136,11 @@ def drawBlines(self, p, pupbound=[None,None,None], plobound=[None,None,None],
         elif multlng is not None:
             bx *= multlng; by *= multlng; bz *= multlng
             
-        drawLine(self.windObj, p, [bx,by,bz])
+        #drawLine(self.windObj, p, [bx,by,bz])
         p[0] += bx; p[1] += by; p[2] += bz
+        pts.append((p[0],p[1],p[2]))
+    #print(pts)
+    self.windObj.select()
+    curve(pos=pts, color=color.red)
         
 BField.drawBlines = drawBlines
