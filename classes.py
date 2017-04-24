@@ -85,9 +85,7 @@ class Particle(object):
             self.p[2] + self.v[2] * dt]
     
     #@profile #For running with line/memory profiler
-    def foRKvCrossB(self, BFieldObj, h): #Highly experimental!  Not sure if algorithm is implemented right.
-    #ToDo verify code/algorithm
-    #ToDo spin out totalBatP into separate processes
+    def foRKvCrossB(self, BFieldObj, h): 
     # Two methods execute at similar speeds - in Py2.7, top executes about 5% faster
     # In Py 3.5, top executes about 10% slower
     # Not exactly sure what to pick
