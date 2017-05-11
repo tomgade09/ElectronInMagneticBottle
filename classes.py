@@ -41,6 +41,7 @@ class Particle(object):
         self.name = name
         self.eom = self.q / self.mass
         self.pic = None
+        self.mu = None #Magnetic moment associated with helical motion perpendicular to B
     
     def calcBatP(self, pB):
         """Calculate B at a point pB due to this particle."""
@@ -55,11 +56,11 @@ class Particle(object):
         #b = [(self.v[1] * pB[2] - self.v[2] * pB[1]) * c,
             #(self.v[2] * pB[0] - self.v[0] * pB[2]) * c,
             #(self.v[0] * pB[1] - self.v[1] * pB[0]) * c]
-        B = cross3DandMult(self.v, pB, c)
-        return B[0], B[1], B[2]
+        BatP = cross3DandMult(self.v, pB, c)
+        return BatP[0], BatP[1], BatP[2]
     
     #@profile #For running with line/memory profiler
-    def __updV(self, b, dt):
+    def __updV(self, dv, dt):
         """Calculate the new velocity of the particle based on the specified B field."""
         #dv = np.cross(self.v, b) * self.eom * dt #Apparently not faster
         #self.v += dv
@@ -71,13 +72,12 @@ class Particle(object):
         #self.v = [self.v[0] + (self.v[1] * b[2] - self.v[2] * b[1]) * self.eom * dt,
             #self.v[1] + (self.v[2] * b[0] - self.v[0] * b[2]) * self.eom * dt,
             #self.v[2] + (self.v[0] * b[1] - self.v[1] * b[0]) * self.eom * dt]
-        vpr = cross3DandMult(self.v, b, self.eom * dt)
-        self.v = [self.v[0] + vpr[0], self.v[1] + vpr[1], self.v[2] + vpr[2]]
+        self.v = [self.v[0] + dv[0], self.v[1] + dv[1], self.v[2] + dv[2]]
         
     #@profile #For running with line/memory profiler
-    def updP(self, b, dt):
+    def updP(self, dv, dt):
         """Calculate the new position based on the particle's velocity."""
-        self.__updV(b, dt)
+        self.__updV(dv, dt)
         #self.p += self.v * dt #For some reason, doesn't work.
         #for i in range(3): #Slower code than below
             #self.p[i] += self.v[i] * dt
@@ -91,37 +91,41 @@ class Particle(object):
     # Not exactly sure what to pick
     # Even with MKL on a Core2Duo, numpy(bottom) is slower - not sure about newer procs
         B1 = BFieldObj.totalBatP(self.p[:])
-        P23 = [self.p[0] + self.v[0] * h / 2, self.p[1] + self.v[1] * h / 2, self.p[2] + 
-            self.v[2] * h / 2]
-        B23 = BFieldObj.totalBatP(P23)
-        P4 = [self.p[0] + self.v[0] * h, self.p[1] + self.v[1] * h, self.p[2] + 
-            self.v[2] * h]
-        B4 = BFieldObj.totalBatP(P4)
-        V1 = self.v[:]
-        k1 = cross3DandMult(V1,B1,self.eom * h)
-        V2 = [self.v[0] + k1[0] / 2, self.v[1] + k1[1] / 2, self.v[2] + k1[2] / 2]
-        k2 = cross3DandMult(V2,B23,self.eom * h)
-        V3 = [self.v[0] + k2[0] / 2, self.v[1] + k2[1] / 2, self.v[2] + k2[2] / 2]
-        k3 = cross3DandMult(V3,B23,self.eom * h)
-        V4 = [self.v[0] + k3[0], self.v[1] + k3[1], self.v[2] + k3[2]]
-        k4 = cross3DandMult(V4,B4,self.eom * h)
+        #P23 = [self.p[0] + self.v[0] * h / 2, self.p[1] + self.v[1] * h / 2, self.p[2] + 
+        #    self.v[2] * h / 2]
+        #B23 = BFieldObj.totalBatP(P23)
+        #P4 = [self.p[0] + self.v[0] * h, self.p[1] + self.v[1] * h, self.p[2] + 
+        #    self.v[2] * h]
+        #B4 = BFieldObj.totalBatP(P4)
+        #V1 = self.v[:]
+        #k1 = cross3DandMult(V1,B1,self.eom * h)
+        #V2 = [self.v[0] + k1[0] / 2, self.v[1] + k1[1] / 2, self.v[2] + k1[2] / 2]
+        #k2 = cross3DandMult(V2,B23,self.eom * h)
+        #V3 = [self.v[0] + k2[0] / 2, self.v[1] + k2[1] / 2, self.v[2] + k2[2] / 2]
+        #k3 = cross3DandMult(V3,B23,self.eom * h)
+        #V4 = [self.v[0] + k3[0], self.v[1] + k3[1], self.v[2] + k3[2]]
+        #k4 = cross3DandMult(V4,B4,self.eom * h)
         
-        k = [(k1[0] + 2 * (k2[0] + k3[0]) + k4[0]) / 6,(k1[1] + 2 * (k2[1] + k3[1]) + 
-            k4[1]) / 6, (k1[2] + 2 * (k2[2] + k3[2]) + k4[2]) / 6]
+        #k = [(k1[0] + 2 * (k2[0] + k3[0]) + k4[0]) / 6,(k1[1] + 2 * (k2[1] + k3[1]) + 
+        #    k4[1]) / 6, (k1[2] + 2 * (k2[2] + k3[2]) + k4[2]) / 6]
         
-        self.v = [self.v[0] + k[0], self.v[1] + k[1], self.v[2] + k[2]]
-        self.p = [self.p[0] + self.v[0] * h, self.p[1] + self.v[1] * h, self.p[2] + 
-            self.v[2] * h]
+        #self.v = [self.v[0] + k[0], self.v[1] + k[1], self.v[2] + k[2]]
+        #self.p = [self.p[0] + self.v[0] * h, self.p[1] + self.v[1] * h, self.p[2] + 
+        #    self.v[2] * h]
         
-        #B2 = BFieldObj.totalBatP(self.p + np.array(self.v) * h / 2)
-        #k11 = self.eom * np.cross(self.v,BFieldObj.totalBatP(self.p)) * h
-        #k22 = self.eom * np.cross(self.v + k11 / 2, B2) * h
-        #k33 = self.eom * np.cross(self.v + k22 / 2, B2) * h
-        #k44 = self.eom * np.cross(self.v + k33, BFieldObj.totalBatP(self.p +
-            #np.array(self.v) * h)) * h
-            
-        #self.v += (k11 + 2 * (k22 + k33) + k44) / 6
-        #self.p += self.v * h
+        k11 = self.eom * np.cross(self.v,BFieldObj.totalBatP(self.p))
+        
+        B2 = BFieldObj.totalBatP(self.p + k11 * h * h / 4)
+        k22 = self.eom * np.cross(self.v + k11 * h / 2, B2)
+        
+        B3 = BFieldObj.totalBatP(self.p + k22 * h * h / 4)
+        k33 = self.eom * np.cross(self.v + k22 * h / 2, B3)
+        
+        B4 = BFieldObj.totalBatP(self.p + k33 * h * h)
+        k44 = self.eom * np.cross(self.v + k33 * h, B4)
+
+        self.v += (h * (k11 + 2 * (k22 + k33) + k44) / 6)
+        self.p += self.v * h
         
 class Electron(Particle):
     """Define an electron as a specific type of 'Particle'"""
@@ -304,6 +308,52 @@ class WireCoilPair(object):
             return self.calcBatPinC(p)
         return self.calcBatPinPy(p)
 
+    def calcDriftsF(self, PartObj, dt):
+        #Calc magnetic moment
+        Bp = np.array(self.calcBatP(PartObj.p))
+        
+        Blen = np.sqrt(Bp[0]**2 + Bp[1]**2 + Bp[2]**2)
+        vperp = np.sqrt(PartObj.v[0]**2 + PartObj.v[1]**2 + PartObj.v[2]**2) - (np.dot(PartObj.v, Bp) / Blen)
+        mu = 1/2 * PartObj.mass * vperp / Blen # should be invariant - so do I need to calculate every time? Check for invariance
+        FgradB = - mu * (self.calcBatP(np.array(PartObj.p) + np.array(PartObj.v) * dt) - Bp)# / (dt * PartObj.v[0])
+        FgradB[0] = FgradB[0] / (dt * PartObj.v[0])
+        print(mu, np.array(FgradB) * dt / PartObj.mass, PartObj.v[0])
+
+        return FgradB[0], FgradB[1], FgradB[2]
+
+class GenericB(object):
+    """Define a generic B at passed in location/time.
+    
+    At the moment, don't add to BField.BObjList.  BField.totalBatP doesn't have a way to handle extra variables (yet).
+    For now, just instantiate this and call {yourGenericBobject}.calcBatP, add it to BField.totalBatP (if necessary) - and away you go.
+    Or better yet, just skip this class and call your function directly, add the results to BField.totalBatP.
+
+    Allows the user to easily define a B Field however they wish.  Must pass in a callback function that gives B.  Can also be constant.
+    
+    Criteria for B Callback function:
+    - Arguments must be passed in as an array
+    - Callback function must handle errors, range checking, etc internally (if you want that stuff)
+    - I think that's it...
+    """
+    def __init__(self, windObj, Bcallback, useC=False, name=None):
+        """Initiate a GenericB object."""
+        self.wind = windObj
+        self.calcBatP = Bcallback
+        self.name = name
+        self.cst = float(self.N * self.I * 10**(-5))
+        self.pic = None
+        self.useC = useC #Not implemented yet
+
+    def calcBatP(args=[]):
+        return Bcallback(args)
+
+def ConstB(GenericB):
+    def __init__(self, Bconst):
+        self.Bconst = Bconst
+    
+    def calcBatP(args=[]):
+        return Bconst
+
 class BField(object):
     """Define a B Field object containing the elements in BObjList."""
     def __init__(self, windObj, BObjList=[], PartList=[], name=None):
@@ -324,3 +374,11 @@ class BField(object):
             Bx += bx; By += by; Bz += bz
         
         return [Bx, By, Bz]
+    
+    def totalDriftsF(self, PartObj, dt):
+        Fx = Fy = Fz = 0
+        for BObj in self.BObjList:
+            fx, fy, fz = BObj.calcDriftsF(PartObj, dt)
+            Fx += fx; Fy += fy; Fz += fz
+
+        return [Fx, Fy, Fz]

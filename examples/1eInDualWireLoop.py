@@ -13,8 +13,8 @@ def main():
     t = 0                              #Initial time [s]
     dt = 5*10**-9
     
-    e1center = [-4.75,0,0]
-    e1vel = [1000,1000,1000]
+    e1center = [-5,0,0]
+    e1vel = [1000,2000,2000]
     wccenter = [0,0,0]
     loopaxis = [1,0,0]
     
@@ -42,7 +42,10 @@ def main():
             wccenter[2]) <= electron1.p[2] <= (10 + wccenter[2])):
         FPSrate(10000)
         Barray = B.totalBatP(electron1.p)
-        electron1.updP(Barray, dt)
+        vdrift = np.array(B.totalDriftsF(electron1, dt)) * dt / electron1.mass
+        vB = cross3DandMult(self.v, Barray, electron1 * dt)
+        dv = np.array(vdrift) + np.array(vB)
+        electron1.updP(dv, dt)
         electron1.updDraw()
 
         t += dt

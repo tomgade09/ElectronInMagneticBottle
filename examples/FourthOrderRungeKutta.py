@@ -11,10 +11,10 @@ from VPyDraw import *
 def main():
     ind = 0                            #Index (Calculation Counter)
     t = 0                              #Initial time [s]
-    dt = 1*10**-7
+    dt = 1*10**-7                      #Loses sufficient resolution at any faster (larger dt) than 1e-7
     
-    e1center = [-5,3.5,0]
-    e1vel = [1000,1000,1000]
+    e1center = [-4,0,0]
+    e1vel = [1000,10000,10000]         #Need high vparallel to vperpendicular (to B field) ratio to confine
     wccenter = [0,0,0]
     loopaxis = [1,0,0]
 
@@ -26,15 +26,17 @@ def main():
     wireCoils.initDraw()
     
     electron1 = Electron(windObj1, e1center, e1vel)
-    electron1.initDraw(10, 50)
+    electron1.initDraw(1, 5000)
     
     B = BField(windObj1)
     B.BObjList.append(wireCoils)
     #B.BObjList.append(electron1) #Messes with mag field lines.  Don't need for now.
     
-    for i in [[-5,3.5,0]]:
+    for i in [[-5,3.5,0],[-5,0,3.5],[-5,-3.5,0],[-5,0,-3.5]]:#, [-5,-2.5*np.sqrt(2),2.5*np.sqrt(2)],[-5,-2.5*np.sqrt(2),-2.5*np.sqrt(2)],[-5,2.5*np.sqrt(2),-2.5*np.sqrt(2)]]:
         j = rotateVector(i,wireCoils.axiscf_theta,wireCoils.axiscf_phi) + wireCoils.Cpair
-        B.drawBlines(j, numiter=71000, multlng=500)#pupbound=[5,None,None]
+        B.drawBlines(j, numiter=5750, multlng=500)#pupbound=[5,None,None]
+    
+    windObj1.center = (electron1.p[0], electron1.p[1], electron1.p[2])
     
     start = time.time()
     while ind < 2500000: #Need to specify a number of iterations or loop would never end
@@ -43,14 +45,16 @@ def main():
             #wccenter[2]) <= electron1.p[2] <= (10 + wccenter[2])):
         FPSrate(10000)
         
-        electron1.foRKvCrossB(B,dt)
+        vdrift = np.array(B.totalDriftsF(electron1, dt)) * dt / electron1.mass
+        electron1.foRKvCrossB(B, dt)
+        electron1.v = [electron1.v[0] + vdrift[0], electron1.v[1] + vdrift[1], electron1.v[2] + vdrift[2]]
         electron1.updDraw()
         t += dt
         ind += 1
         updateTimeClock(windObj1, relclockObj1, t)
         if ind % 1000 == 0:
             windObj1.center = (electron1.p[0], electron1.p[1], electron1.p[2])
-            print(ind, time.time() - start)
+            #print(ind, time.time() - start)
     
     while True:
         FPSrate(30)
