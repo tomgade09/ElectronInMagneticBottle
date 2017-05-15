@@ -315,8 +315,8 @@ class WireCoilPair(object):
         Blen = np.sqrt(Bp[0]**2 + Bp[1]**2 + Bp[2]**2)
         vperp = np.sqrt(PartObj.v[0]**2 + PartObj.v[1]**2 + PartObj.v[2]**2) - (np.dot(PartObj.v, Bp) / Blen)
         mu = 1/2 * PartObj.mass * vperp / Blen # should be invariant - so do I need to calculate every time? Check for invariance
-        FgradB = - mu * (self.calcBatP(np.array(PartObj.p) + np.array(PartObj.v) * dt) - Bp)# / (dt * PartObj.v[0])
-        FgradB[0] = FgradB[0] / (dt * PartObj.v[0])
+        FgradB = - mu * (self.calcBatP(np.array(PartObj.p) + np.array(PartObj.v) * dt) - Bp)
+        FgradB[0] = FgradB[0] / (dt * PartObj.v[0]); FgradB[1] = FgradB[1] / (dt * PartObj.v[1]); FgradB[2] = FgradB[2] / (dt * PartObj.v[2])
         print(mu, np.array(FgradB) * dt / PartObj.mass, PartObj.v[0])
 
         return FgradB[0], FgradB[1], FgradB[2]
