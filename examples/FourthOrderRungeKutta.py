@@ -13,7 +13,7 @@ def main():
     t = 0                              #Initial time [s]
     dt = 1*10**-7                      #Loses sufficient resolution at any faster (larger dt) than 1e-7
     
-    e1center = [-4,3.5,0]
+    e1center = [-4,0,0]
     e1vel = [1000,10000,10000]         #Need high vparallel to vperpendicular (to B field) ratio to confine
     wccenter = [0,0,0]
     loopaxis = [1,0,0]

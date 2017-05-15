@@ -319,7 +319,7 @@ class WireCoilPair(object):
         for i in range(len(FgradB)):
             div = Bp[i]
             if Bp[i] == 0:
-                div = 1e-23
+                div = 1e-18
             FgradB[i] = FgradB[i] / div
         print(mu, np.array(FgradB) * dt / PartObj.mass, PartObj.v[0]) #mu, vgradB, v(x)
 
