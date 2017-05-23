@@ -314,7 +314,7 @@ class WireCoilPair(object):
                 continue
             FgradB[i] = FgradB[i] / (2 * scaledLength)
         
-        print(mu, np.array(FgradB) / PartObj.mass, halfds, BpdotV / Bplen, np.sqrt(vperp2), PartObj.p[0]) #mu, agradB, halfds, vparallel, vperp, x
+        #print(mu, np.array(FgradB) / PartObj.mass, halfds, BpdotV / Bplen, np.sqrt(vperp2), PartObj.p[0]) #mu, agradB, halfds, vparallel, vperp, x
 
         return FgradB[0], FgradB[1], FgradB[2]
 

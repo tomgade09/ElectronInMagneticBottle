@@ -18,7 +18,7 @@ def main():
     wccenter = [0,0,0]
     loopaxis = [1,0,0]
 
-    windObj1 = drawWindow(1920, 1080, e1center) #create a window Object and store it in a variable, arguments (width pixels, height pixels, where display is initially centered)
+    windObj1 = drawWindow(1920, 1080, e1center) #Mandatory for visualization - create a window Object, arguments (width pixels, height pixels, where display is initially centered)
     relclockObj1 = drawTimeClock(windObj1, [-6.5,0,0], 0) #Optional - if you want to see how much time has elapsed, arguments are (windObj from above, location, initial time)
 
     wireCoils = WireCoilPair(windObj1, wccenter, loopaxis, 1, 1, 5, 5, useC=True) #this creates an object (wire coils) that will be used to calculate the B that shapes the particle's trajectory
