@@ -1,6 +1,19 @@
 from classes import *
 from visual import *
 
+#def setupDisplay(wd=1920, ht=1080, center=[0,0,0], axistype="points"):
+# Could do this to make setup easier...put everything in a wrapper function/class
+#def updateDisplay():
+
+def pauseOnKey(keystr, windObj):
+    if windObj.kb.keys:
+        key = windObj.kb.getkey()
+        if key == keystr:
+            print("Press Enter to resume.")
+            windObj.waitfor('\n keydown')
+            print("Resumed.")
+            windObj.kb.queue = []
+
 def drawWindow(wd, ht, cent, axistype="points"):
     centx = cent[0]
     centy = cent[1]
@@ -143,4 +156,4 @@ def drawBlines(self, p, pupbound=[None,None,None], plobound=[None,None,None],
     self.windObj.select()
     curve(pos=pts, color=color.red)
         
-BField.drawBlines = drawBlines
+Fields.drawBlines = drawBlines

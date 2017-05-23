@@ -15,7 +15,7 @@ if _platform == "linux" or _platform == "linux2":
     libFilePath = classpath + '/lib/' + libName + '.so'
 elif _platform == "win32":
     libFilePath = classpath + '/lib/' + libName + '.dll'
-elif _platform == "darwin": #All of MagBottlePy is untested on Darwin
+elif _platform == "darwin": #All of MagBottlePy is untested on Darwin, but should work
     libFilePath = classpath + '/lib/' + libName + '.dylib'
 
 class Particle(object):
@@ -59,72 +59,34 @@ class Particle(object):
         BatP = cross3DandMult(self.v, pB, c)
         return BatP[0], BatP[1], BatP[2]
 
-    def calcEatP(self, pE): #To do
+    def calcEatP(self, pE): #To do, put here?
         return 0
     
     #@profile #For running with line/memory profiler
     def __updV(self, dv, dt):
         """Calculate the new velocity of the particle based on the specified B field."""
-        #dv = np.cross(self.v, b) * self.eom * dt #Apparently not faster
-        #self.v += dv
-        #dv = [self.v[1]*b[2]-self.v[2]*b[1], #Below cuts 20% time off
-            #self.v[2]*b[0]-self.v[0]*b[2],
-            #self.v[0]*b[1]-self.v[1]*b[0]]
-        #for i in range(3):
-            #self.v[i] += (dv[i] * self.eom * dt)
-        #self.v = [self.v[0] + (self.v[1] * b[2] - self.v[2] * b[1]) * self.eom * dt,
-            #self.v[1] + (self.v[2] * b[0] - self.v[0] * b[2]) * self.eom * dt,
-            #self.v[2] + (self.v[0] * b[1] - self.v[1] * b[0]) * self.eom * dt]
         self.v = [self.v[0] + dv[0], self.v[1] + dv[1], self.v[2] + dv[2]]
         
     #@profile #For running with line/memory profiler
-    def updP(self, dv, dt):
+    def updP(self, dF, dt):
         """Calculate the new position based on the particle's velocity."""
+        dv = np.array(dF) * dt / self.mass
         self.__updV(dv, dt)
-        #self.p += self.v * dt #For some reason, doesn't work.
-        #for i in range(3): #Slower code than below
-            #self.p[i] += self.v[i] * dt
         self.p = [self.p[0] + self.v[0] * dt, self.p[1] + self.v[1] * dt,
             self.p[2] + self.v[2] * dt]
     
     #@profile #For running with line/memory profiler
-    def foRKvCrossB(self, BFieldObj, h): 
-    # Two methods execute at similar speeds - in Py2.7, top executes about 5% faster
-    # In Py 3.5, top executes about 10% slower
-    # Not exactly sure what to pick
-    # Even with MKL on a Core2Duo, numpy(bottom) is slower - not sure about newer procs
-        B1 = BFieldObj.totalBatP(self.p[:])
-        #P23 = [self.p[0] + self.v[0] * h / 2, self.p[1] + self.v[1] * h / 2, self.p[2] + 
-        #    self.v[2] * h / 2]
-        #B23 = BFieldObj.totalBatP(P23)
-        #P4 = [self.p[0] + self.v[0] * h, self.p[1] + self.v[1] * h, self.p[2] + 
-        #    self.v[2] * h]
-        #B4 = BFieldObj.totalBatP(P4)
-        #V1 = self.v[:]
-        #k1 = cross3DandMult(V1,B1,self.eom * h)
-        #V2 = [self.v[0] + k1[0] / 2, self.v[1] + k1[1] / 2, self.v[2] + k1[2] / 2]
-        #k2 = cross3DandMult(V2,B23,self.eom * h)
-        #V3 = [self.v[0] + k2[0] / 2, self.v[1] + k2[1] / 2, self.v[2] + k2[2] / 2]
-        #k3 = cross3DandMult(V3,B23,self.eom * h)
-        #V4 = [self.v[0] + k3[0], self.v[1] + k3[1], self.v[2] + k3[2]]
-        #k4 = cross3DandMult(V4,B4,self.eom * h)
+    def foRKvCrossB(self, FieldObj, h): 
+        B1 = FieldObj.totalBatP(self.p[:])
+        k11 = self.eom * np.cross(self.v,FieldObj.totalBatP(self.p))
         
-        #k = [(k1[0] + 2 * (k2[0] + k3[0]) + k4[0]) / 6,(k1[1] + 2 * (k2[1] + k3[1]) + 
-        #    k4[1]) / 6, (k1[2] + 2 * (k2[2] + k3[2]) + k4[2]) / 6]
-        
-        #self.v = [self.v[0] + k[0], self.v[1] + k[1], self.v[2] + k[2]]
-        #self.p = [self.p[0] + self.v[0] * h, self.p[1] + self.v[1] * h, self.p[2] + 
-        #    self.v[2] * h]
-        
-        k11 = self.eom * np.cross(self.v,BFieldObj.totalBatP(self.p))
-        
-        B2 = BFieldObj.totalBatP(self.p + k11 * h * h / 4)
+        B2 = FieldObj.totalBatP(self.p + k11 * h * h / 4)
         k22 = self.eom * np.cross(self.v + k11 * h / 2, B2)
         
-        B3 = BFieldObj.totalBatP(self.p + k22 * h * h / 4)
+        B3 = FieldObj.totalBatP(self.p + k22 * h * h / 4)
         k33 = self.eom * np.cross(self.v + k22 * h / 2, B3)
         
-        B4 = BFieldObj.totalBatP(self.p + k33 * h * h)
+        B4 = FieldObj.totalBatP(self.p + k33 * h * h)
         k44 = self.eom * np.cross(self.v + k33 * h, B4)
 
         self.v += (h * (k11 + 2 * (k22 + k33) + k44) / 6)
@@ -168,8 +130,6 @@ class WireCoilPair(object):
         self.cst = float(self.N * self.I * 10**(-5))
         self.pic = None
         self.useC = useC
-        self.Bline = True
-        self.firstRun = True
                 
         if self.axis[0] != 0 and self.axis[1] == 0 and self.axis[2] == 0:
             #X axis - no rotation, don't run code that's not necessary
@@ -214,22 +174,6 @@ class WireCoilPair(object):
         lib.dBx.argtypes = (ctypes.c_int, ctypes.c_double)
         lib.dBy.argtypes = (ctypes.c_int, ctypes.c_double)
         lib.dBz.argtypes = (ctypes.c_int, ctypes.c_double)
-        
-        #cpp gauss_legendre test
-        #lib = ctypes.CDLL(libFilePath)
-        #lib.calcBxatP.restype = ctypes.c_double
-        #lib.calcByatP.restype = ctypes.c_double
-        #lib.calcBzatP.restype = ctypes.c_double
-        #lib.calcBxatP.argtypes = (ctypes.c_double, ctypes.c_double, ctypes.c_double, ctypes.c_double, 
-        #    ctypes.c_double, ctypes.c_double, ctypes.c_double)
-        #lib.calcByatP.argtypes = (ctypes.c_double, ctypes.c_double, ctypes.c_double, ctypes.c_double, 
-        #    ctypes.c_double, ctypes.c_double, ctypes.c_double)
-        #lib.calcBzatP.argtypes = (ctypes.c_double, ctypes.c_double, ctypes.c_double, ctypes.c_double, 
-        #    ctypes.c_double, ctypes.c_double, ctypes.c_double)
-        
-        #bx = lib.calcBxatP(p[0], p[1], p[2], self.N, self.I, self.R, self.d)
-        #by = lib.calcByatP(p[0], p[1], p[2], self.N, self.I, self.R, self.d)
-        #bz = lib.calcBzatP(p[0], p[1], p[2], self.N, self.I, self.R, self.d)
         
         c1 = -self.cst * self.R * ppr[2]
         c2 = -self.cst * self.R * ppr[1]
@@ -313,88 +257,64 @@ class WireCoilPair(object):
             return self.calcBatPinC(p)
         return self.calcBatPinPy(p)
 
-    def calcDriftsF(self, BFObj, CoilObj, PartObj, dt):
-        
+    def calcGuidingCenter(self, PartObj, dt):
         # The method:
         # 1. Calculate B at the position of the particle
         # 2. Calculate q * (v x B) (Lorentz F), perpendicular velocity, and Larmour radius
         #       These will be used to calculate a Guiding Center location, They won't be exact but should be really close
         #       FLorentz / (length of F lorentz) - gives a unit vector in the direction of the Lorentz force - toward the GC
         #       Multiply this vector by Larmour radius and add to the particle position to get the approx GC
-        # 3. Calculate B at guiding center
-        # 4. Use this Bgc to calculate the mirror force on the particle
+        # 3. (optional) Calculate B at guiding center, if desired, or use GC for other purposes
+        #       - Use this Bgc to calculate the mirror force on the particle for increased accuracy
         
         # Note: subscript "p" denotes quantities calculated at a point P / with the B calculated at point P, while "gc" is used to
         # denote the same quantities at the guiding center.
         # This method is used to overcome a difficulty related to the fact that we need B at the guiding center in order to calculate
         # vperp (which is needed for Larmour radius rL).  We can't get rL without B at GC and we can't know where GC is without rL.
-        # This method uses vperp from B at the particle's position (instead of GC), but it should be close enough to get the location of GC.
+        # This method uses vperp from B at the particle's position (instead of B at GC), but it should be close enough to get the approx. location of GC.
+        # At any rate, it will be closer than calculating from the particle's position P.
 
         Bp = np.array(self.calcBatP(PartObj.p))
         Bplen = np.sqrt(Bp[0]**2 + Bp[1]**2 + Bp[2]**2)
-        #FLorentz = self.foRKLorentz(PartObj, dt)
-        #FLlen = np.sqrt(FLorentz[0]**2 + FLorentz[1]**2 + FLorentz[2]**2)
-        #vp_perp = np.sqrt((PartObj.v[0]**2 + PartObj.v[1]**2 + PartObj.v[2]**2) - (np.dot(Bp, PartObj.v) / Bplen)**2)
         
-        #rLp = PartObj.mass * vp_perp / (np.abs(PartObj.q) * Bplen)
-        #Bgc = np.array(self.calcBatP(PartObj.p + (rLp / FLlen) * FLorentz))
-        #Bgclen = np.sqrt(Bgc[0]**2 + Bgc[1]**2 + Bgc[2]**2)
-        #Bgc_dotV = np.dot(Bgc, PartObj.v)
-
-        scaledLength = 1e-8 #Creating a vector in the direction of Bp with length = scaledLength, this will be 1/2 length of the ds vector
-        #halfds = (scaledLength / Bgclen) * Bgc
-        #Bgcminus = np.array(self.calcBatP(PartObj.p - halfds)) #using scaled Bp vector as an element, ds, along which B is calculated - dB/ds = (B(p+ds) - B(p-ds)) / ds
-        #Bgcplus = np.array(self.calcBatP(PartObj.p + halfds))
-        #Bgcdiff = Bgcplus - Bgcminus #for debug
-        #Bgcdifflen = np.sqrt(Bgcdiff[0]**2 + Bgcdiff[1]**2 + Bgcdiff[2]**2)#for debug
-
-        ################Other Way#############
-        Bgc_dotV = np.dot(Bp, PartObj.v)
-        Bgclen = Bplen
-        halfds = (scaledLength / Bgclen) * Bp
-        Bgcminus = np.array(self.calcBatP(PartObj.p - halfds)) #using scaled Bp vector as an element, ds, along which B is calculated - dB/ds = (B(p+ds) - B(p-ds)) / ds
-        Bgcplus = np.array(self.calcBatP(PartObj.p + halfds))
-        ######################################
-
-        ##DEBUG##
-        #if self.Bline == True:  #Remove this as well as CoilObj and BFObj from arguments (and in BField)
-            #j = rotateVector(PartObj.p + (rLp / FLlen) * FLorentz,CoilObj.axiscf_theta,CoilObj.axiscf_phi) + CoilObj.Cpair
-            #BFObj.drawBlines(j, numiter=5550, multlng=500)#pupbound=[5,None,None]
-            #self.Bline = False
-        ##DEBUG##
-
-        vperp2 = (PartObj.v[0]**2 + PartObj.v[1]**2 + PartObj.v[2]**2) - (Bgc_dotV / Bgclen)**2 #length of vperp squared
-        mu = PartObj.mass * vperp2 / (2 * Bgclen) # should be invariant - so do I need to calculate every time? Check for invariance
+        FLorentz = self.foRKLorentz(PartObj, dt)
+        FLlen = np.sqrt(FLorentz[0]**2 + FLorentz[1]**2 + FLorentz[2]**2)
         
-        #if self.firstRun == True:
-            #vperp2 = (PartObj.v[0]**2 + PartObj.v[1]**2 + PartObj.v[2]**2) - (Bgc_dotV / Bgclen)**2 #length of vperp squared
-            #mu = PartObj.mass * vperp2 / (2 * Bgclen)
-            #PartObj.mu = mu
-            #self.firstRun = False
-        #else:
-            #mu = PartObj.mu
-            #vperp2 = 2 * PartObj.mu * Bgclen / PartObj.mass # only calc for debug
+        vp_perp = np.sqrt((PartObj.v[0]**2 + PartObj.v[1]**2 + PartObj.v[2]**2) - (np.dot(Bp, PartObj.v) / Bplen)**2)
+        rLp = PartObj.mass * vp_perp / (np.abs(PartObj.q) * Bplen)
+        
+        return np.array(PartObj.p + (rLp / FLlen) * FLorentz)
 
-        #if Bgc_dotV > 0: #sign check, ensures the slope is calculated as the point "in front" of the particle minus the point "behind" the particle
-            #FgradB = - mu * (Bgcplus - Bgcminus) #these four lines (if, else) don't affect Larmour radius change
-        #else:
-            #FgradB = - mu * (Bgcminus - Bgcplus)
+    def drawBfromGC(self, PartObj, FieldObj, numiter=5500, multlng=500):
+        j = rotateVector(self.calcGuidingCenter(PartObj, FieldObj.dt), self.axiscf_theta, self.axiscf_phi) + self.Cpair
+        FieldObj.drawBlines(j, numiter=numiter, multlng=multlng)
+        
+    def calcDriftsF(self, PartObj):
+        return self.calcMirrorF(PartObj)
 
-        FgradB = - mu * (Bgcplus - Bgcminus)
+    def calcMirrorF(self, PartObj):
+        Bp = np.array(self.calcBatP(PartObj.p))
+        Bplen = np.sqrt(Bp[0]**2 + Bp[1]**2 + Bp[2]**2)
+        BpdotV = np.dot(Bp, PartObj.v)
+        
+        scaledLength = 1e-8 #total length of vector in the direction of B that is used to calculate B(p+ds) and B(p-ds)
+        halfds = (scaledLength / Bplen) * Bp
+        
+        Bpminus = np.array(self.calcBatP(PartObj.p - halfds)) #using scaled Bp vector as an element, ds, along which B is calculated - dB/ds = (B(p+ds) - B(p-ds)) / ds
+        Bpplus = np.array(self.calcBatP(PartObj.p + halfds))
+
+        vperp2 = (PartObj.v[0]**2 + PartObj.v[1]**2 + PartObj.v[2]**2) - (BpdotV / Bplen)**2 #length of vperp squared
+        mu = PartObj.mass * vperp2 / (2 * Bplen) # should be invariant - so do I need to calculate every time? Check for invariance
+        FgradB = - mu * (Bpplus - Bpminus)
 
         for i in range(3): 
             if abs(Bp[i]) < 1e-20: #Not sure, think it should work for the examples, but probably not general enough - maybe a ratio to other elements?
-                FgradB[i] = 0. #More for the first calculation than anything. Seems to only be used once when on axis
+                FgradB[i] = 0. #More for the first calculation than anything. Only used once -> when exactly on axis
                 #print("zeroed a FgradB element ", i)
                 continue
-            FgradB[i] = FgradB[i] / (2 * scaledLength) #Maybe something wrong here
+            FgradB[i] = FgradB[i] / (2 * scaledLength)
         
-        #DEBUG########################
-        #print(PartObj.p + (rLp / FLlen) * FLorentz) #Pgc
-        #print(Bpdiff, Bpavg, PartObj.p[0])
-        #print(Bpdiff[1] / Bpsum[1], Bpdiff[2] / Bpsum[2])
-        #print(vperp2, vp_perp**2, np.abs(vperp2 - vp_perp**2) / vperp2, PartObj.p[0])
-        print(mu, np.array(FgradB) * dt / PartObj.mass, halfds, Bgc_dotV / Bgclen, np.sqrt(vperp2), PartObj.p[0]) #mu, vgradB, halfds, vparallel, vperp, x
+        print(mu, np.array(FgradB) / PartObj.mass, halfds, BpdotV / Bplen, np.sqrt(vperp2), PartObj.p[0]) #mu, agradB, halfds, vparallel, vperp, x
 
         return FgradB[0], FgradB[1], FgradB[2]
 
@@ -413,10 +333,15 @@ class WireCoilPair(object):
 
         return (PartObj.mass * (k11 + 2 * (k22 + k33) + k44) / 6) #mass * accel = Force
 
+    def calcTotalF(self, PartObj, dt):
+        Fl = np.array(self.foRKLorentz(PartObj, dt))
+        Fd = np.array(self.calcDriftsF(PartObj))
+        return (Fl + Fd)
+
 class GenericB(object):
     """Define a generic B at passed in location/time.
     
-    At the moment, don't add to BField.BObjList.  BField.totalBatP doesn't have a way to handle extra variables (yet).
+    At the moment, don't add to Field.BObjList.  BField.totalBatP doesn't have a way to handle extra variables (yet).
     For now, just instantiate this and call {yourGenericBobject}.calcBatP, add it to BField.totalBatP (if necessary) - and away you go.
     Or better yet, just skip this class and call your function directly, add the results to BField.totalBatP.
 
@@ -446,15 +371,19 @@ def ConstB(GenericB):
     def calcBatP(args=[]):
         return self.Bconst
 
-class BField(object):
-    """Define a B Field object containing the elements in BObjList."""
-    def __init__(self, windObj, dt=1e-9, BObjList=[], PartList=[], name=None):
+class Fields(object):
+    """Define a container object containing Electric and Magnetic Field producing elements and particles.  Call functions related to B and E and sum them.
+    Call functions to update position and velocity of particles."""
+
+    def __init__(self, windObj, dt=1e-9, BObjList=[], PartList=[], EObjList=[], name=None):
         """Initialize a B Field object."""
         self.windObj = windObj
         self.BObjList = BObjList[:]
+        self.EObjList = EObjList[:] #Not implemented yet - need to account for drifts, etc
         self.particleList = PartList[:]
         self.name = name
         self.dt = dt
+        self.t = 0.
         
     def totalBatP(self, p):
         """Calculate total B at p due to all objects in BObjList.  Calculates them one at a time and adds them together."""
@@ -462,16 +391,21 @@ class BField(object):
         for BObj in self.BObjList:
             bx, by, bz = BObj.calcBatP(p)
             Bx += bx; By += by; Bz += bz
-        for BObj in self.particleList:
-            bx, by, bz = BObj.calcBatP(p)
-            Bx += bx; By += by; Bz += bz
+        #for PartObj in self.particleList: #Need to test a bit more
+            #bx, by, bz = PartObj.calcBatP(p)
+            #Bx += bx; By += by; Bz += bz
         
         return [Bx, By, Bz]
     
-    def totalDriftsF(self, BFObj, CoilObj, PartObj, dt): #replace with self.dt once examples can be updated
-        Fx = Fy = Fz = 0 #remove BFObj, CoilObj above and below
+    def totalFonParticle(self, PartObj):
+        Fx = Fy = Fz = 0
         for BObj in self.BObjList:
-            fx, fy, fz = BObj.calcDriftsF(BFObj, CoilObj, PartObj, dt)
+            fx, fy, fz = BObj.calcTotalF(PartObj, self.dt)
             Fx += fx; Fy += fy; Fz += fz
-
+        
         return [Fx, Fy, Fz]
+    
+    def updateParticleP_V(self):
+        for Part in self.particleList:
+            Part.updP(self.totalFonParticle(Part), self.dt)
+        self.t += self.dt
