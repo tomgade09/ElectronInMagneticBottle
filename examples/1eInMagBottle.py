@@ -26,7 +26,7 @@ def main():
     wireCoils.initDraw() #Mandatory if you want to visualize
     
     electron1 = Electron(windObj1, e1center, e1vel) #Mandatory - create a particle to interact with the B Bottle - doesn't have to be an electron
-    electron1.initDraw(1, 5000) #Mandatory if visualizing - arguments: (interval - draw every ___ point, trail length - keep a history of ___ points on the screen)
+    electron1.initDraw(1, 250) #Mandatory if visualizing - arguments: (interval - draw every ___ point, trail length - keep a history of ___ points on the screen)
     points(pos=e1center, size=5, color=color.red) #Optional - draw a point at electron1 start point for reference
 
     #electron2 = Electron(windObj1, e2center, e1vel) #Create another particle if you want to model two - note, particles interacting via E field not implemented yet
@@ -40,7 +40,7 @@ def main():
         j = rotateVector(i,wireCoils.axiscf_theta,wireCoils.axiscf_phi) + wireCoils.Cpair
         Field.drawBlines(j, numiter=5750, multlng=500)
     
-    wireCoils.drawBfromGC(electron1, Field) #Optional - draw the B line extending from the particle's guiding center to see how well the particle follows it
+    wireCoils.drawBfromGC(electron1, Field, numiter=2250) #Optional - draw the B line extending from the particle's guiding center to see how well the particle follows it
 
     start = time.time() #Optional - for tracking real time elapsed - useful for figuring out how fast your computer does all this stuff
     while ind < 2500000: #Mandatory - Everything needs to be nested in a loop - that is unless you only want to do one calculation
