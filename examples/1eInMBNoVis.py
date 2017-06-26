@@ -19,8 +19,8 @@ def main():
     loopaxis = [1,0,0]
     positionHistory = []               #Used in example of what to do with the data
 
-    wireCoils = WireCoilPair(None, wccenter, loopaxis, 1, 1, 5, 5, useC=True) #this creates an object (wire coils) that will be used to calculate the B that shapes the particle's trajectory
-    #Arguments are: (window to draw to - use None if not visualizing, center of wire coils, axis the loop lies along, number of turns, current, radius of coil, distance from wccenter)
+    wireCoils = WireCoilPair(None, wccenter, loopaxis, 1, 1, 5, 5, useC=False) #this creates an object (wire coils) that will be used to calculate the B that shapes the particle's trajectory
+    #Arguments are: (window to draw to - use None if not visualizing, center of wire coils, axis the loop lies along, number of turns, current, radius of coil, distance from wccenter, useC=[False if you haven't compiled the C library, True if you have])
     
     electron1 = Electron(None, e1center, e1vel) #Mandatory - create a particle to interact with the B Bottle - doesn't have to be an electron
 

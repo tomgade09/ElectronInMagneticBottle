@@ -21,8 +21,8 @@ def main():
     windObj1 = drawWindow(1920, 1080, e1center) #Mandatory for visualization - create a window Object, arguments (width pixels, height pixels, where display is initially centered)
     relclockObj1 = drawTimeClock(windObj1, [-6.5,0,0], 0) #Optional - if you want to see how much time has elapsed, arguments are (windObj from above, location, initial time)
 
-    wireCoils = WireCoilPair(windObj1, wccenter, loopaxis, 1, 1, 5, 5, useC=True) #this creates an object (wire coils) that will be used to calculate the B that shapes the particle's trajectory
-    #Arguments are: (window to draw to - use None if not visualizing, center of wire coils, axis the loop lies along, number of turns, current, radius of coil, distance from wccenter)
+    wireCoils = WireCoilPair(windObj1, wccenter, loopaxis, 1, 1, 5, 5, useC=False) #this creates an object (wire coils) that will be used to calculate the B that shapes the particle's trajectory
+    #Arguments are: (window to draw to - use None if not visualizing, center of wire coils, axis the loop lies along, number of turns, current, radius of coil, distance from wccenter, useC=[False if you haven't compiled the C library, True if you have])
     wireCoils.initDraw() #Mandatory if you want to visualize
     
     electron1 = Electron(windObj1, e1center, e1vel) #Mandatory - create a particle to interact with the B Bottle - doesn't have to be an electron
