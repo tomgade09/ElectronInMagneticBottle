@@ -7,7 +7,9 @@ MagBottlePy is a library for defining magnetic bottles and modeling motion of ch
 Additionally, some code is written in C to optimize a few computationally intensive functions.  See below for info on building for your platform, as well as developing your own C functions to extend the functionality of MagBottlePy.
 
 ## Compatibility
-MagBottlePy is compatible with all flavors of Python, OS platforms (Darwin is untested, but should work), and 32/64 bit architectures as long as you don't need to visualize the results.  If visualization is desired, at the moment, there must be a version of VPython 5 or 6 available to Python.  This means Python 3 is out on all platforms, as well as VPython visualization on Linux (to the knowledge of the author at the time of writing), unfortunately.  Perhaps other visualization engines will be examined in the future and will be added.  We'll see.
+MagBottlePy is compatible with all flavors of Python, OS platforms (Darwin is untested, but should work), and 32/64 bit architectures as long as you don't need to visualize the results.  If visualization is desired, at the moment, there must be a version of VPython 5 or 6 available to Python (http://vpython.org/).  This means Python 3 is out on all platforms, as well as VPython visualization on Linux (to the knowledge of the author at the time of writing - since there is no VPython Linux version), unfortunately.  Perhaps other visualization engines will be examined in the future and will be added.  We'll see.  
+
+So, to summarize, visualization is Windows only: 32 bit Python 2.7 through VPython, or 64 bit Python 2.7 through OpenGL/MinVR2 (32 bit may work too, just haven't tested that extensively).
 
 ## Dependencies
 SciPy, NumPy, [VPython (aka Visual) AND/OR PyOpenGL] (see above - Compatibility)
