@@ -52,16 +52,16 @@ Untested
 
 #### Run an example
 
-Open your favorite Python IDE and run from there, or
+Open "examples/1eInMagBottle.py" your favorite Python IDE and run from there, or
 
 ```
 cd examples
-python 1eInDualWireLoop.py
+python 1eInMagBottle.py
 ```
 
 ## Classes and functions: A brief documentation
 
-See ClassesAndFunctions.md
+See ClassesAndFunctions.md (In progress)
   
 ## Extending the functionality of MagBottlePy
 

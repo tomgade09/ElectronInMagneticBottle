@@ -91,3 +91,5 @@ ENV/
 
 # Test folders
 cpp - gl test/
+
+.nogit
