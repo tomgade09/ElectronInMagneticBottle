@@ -27,26 +27,25 @@ Use as is or compile the C optimizations (instructions below).
 
 #### Build C Optimization Library (optional)
 
-*Note: This is only necessary if you desire to utilize the code developed in C (used to speed up the calculations by a little over 2x).  This requires a compatible compiler.  For Windows, CMake (3.6.0-rc4 as of this writing) and Visual Studio (Community 2015) are used.  VS can be obtained for free from Microsoft's website.  Google search both to easily find.  On Linux, gcc is used.*
+*Note: This is only necessary if you desire to utilize the code developed in C (used to speed up the calculations significantly).  This requires a compatible compiler.  For Windows, CMake (3.6.0-rc4 as of this writing) and Visual Studio (Community 2015) are used.  VS can be obtained for free from Microsoft's website.  Google search both to easily find.  On Linux, gcc is used.*
 
 * Windows (CMake and Visual Studio)
 
 1. Run CMake gui.
-2. Click "Browse Source" and point to c directory in MagBottlePy root.
-3. Click "Browse Build" and point to c/build directory in MagBottlePy root.  If the folder doesn't exist, create it.
+2. Click "Browse Source" and point to cExtension directory in MagBottlePy root.
+3. Click "Browse Build" and point to cExtension/build directory in MagBottlePy root.  If the folder doesn't exist, create it.
 4. Click "Configure".
 5. Select the appropriate version of VS ("Visual Studio 14 2015" at the time of writing) and click "Finish".  Ignore warnings.
 *Note: Ensure to select the applicable processor architecture.  A library compiled for 64 bit applications will not work in 32 bit Python and vice versa!  If you intend to use a 64 bit version of Python AND have a 64 bit version of Windows installed, click the version followed by "Win64" ("Visual Studio ## YEAR Win64").  Otherwise, click the appropriate version of VS without anything following the year ("Visual Studio ## YEAR").  You can ignore "ARM" unless you are going to run on a mobile device or Raspberry Pi (unlikely).*
 6. Click "Generate".
-7. Open the build folder and double click the *.sln file.  This file should open in VS.  In the menu bar go to "Build" > "Build Solution".
-8. Once complete, right click on "Install" in the Solution Explorer (usually on the left side of the screen.  Click "Build".  DLL file should be installed to the lib folder in the project root.  Python code will point to the library automatically.
+7. Open the build folder and double click the *.sln file.  This file should open in VS.  Below the menu bar, you will see a dropbox that says "Debug".  Change this to "Release".
+8. In the menu bar go to "Build" > "Build Solution".
+9. Once complete, right click on "Install" in the Solution Explorer (usually on the left side of the screen.  Click "Build".  DLL file should be installed to the lib folder in the project root.  Python code will point to the library automatically.
 
 * Linux (much easier)
 
   ```
-  # Run from c directory in the project root
-  gcc -shared -o WireCoilB.so -fPIC WireCoilB.c
-  mv WireCoilB.so ./../lib/
+  Not tested as of now, but cmake should be able to build the .so library automatically.
   ```
   
 * Mac OS X
@@ -54,19 +53,9 @@ Untested
 
 #### Run an example
 
-Open "examples/1eInMagBottle.py" your favorite Python IDE and run from there, or
+Ensure proper dependencies are installed (see above).  Open "examples/1eInMagBottle.py" your favorite Python IDE and run from there, or
 
 ```
 cd examples
 python 1eInMagBottle.py
 ```
-
-## Classes and functions: A brief documentation
-
-See ClassesAndFunctions.md (In progress)
-  
-## Extending the functionality of MagBottlePy
-
-#### Adding additional B Field producing elements
-
-#### Speeding up B Field iterative calculations with C

@@ -92,4 +92,4 @@ ENV/
 # Test folders
 __*/
 
-.nogit
+*.nogit
