@@ -45,6 +45,7 @@ set(mbc_particle_h
 
 set(mbc_tools_cpp
   ${mbc_src_dir}/tools/constsandtypes.cpp
+  ${mbc_src_dir}/tools/numericalTechniques.cpp
   ${mbc_src_dir}/tools/vectortools.cpp
 )
 
