@@ -44,12 +44,11 @@ Use as is or compile the C optimizations (instructions below).
 
 * Linux (much easier)
 
-  ```
   Not tested as of now, but cmake should be able to build the .so library automatically.
-  ```
   
 * Mac OS X
-Untested
+
+  Untested
 
 #### Run an example
 
