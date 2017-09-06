@@ -16,7 +16,7 @@ dist/
 downloads/
 eggs/
 .eggs/
-# lib/
+lib/
 lib64/
 parts/
 sdist/
@@ -90,6 +90,6 @@ ENV/
 .ropeproject
 
 # Test folders
-cpp - gl test/
+__*/
 
 .nogit

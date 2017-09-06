@@ -4,7 +4,10 @@ import os, sys, inspect, time
 a = os.path.dirname(os.path.abspath(inspect.getsourcefile(lambda:0)))
 sys.path.append(a + '/../')
 sys.path.append(a + '/../vis/')
+sys.path.append(a + '/../cExtension/')
 os.chdir(a)
+
+useCLib = False
 
 from classes import *
 
@@ -26,7 +29,7 @@ def main():
 
     #electron2 = Electron(None, e2center, e1vel) #Create another particle if you want to model two - note, particles interacting via E field not implemented yet
 
-    Field = Fields(None, dt, [wireCoils], [electron1])#, electron2]) #Mandatory - create a "wrapper" for everything
+    Field = Fields(None, dt, [wireCoils], [electron1], useC=useCLib)#, electron2]) #Mandatory - create a "wrapper" for everything
     #Arguments: (window to draw to, time step, B field producing objects, particles)
 
     start = time.time() #Optional - for tracking real time elapsed - useful for figuring out how fast your computer does all this stuff

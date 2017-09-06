@@ -4,7 +4,9 @@ import os, sys, inspect, time
 a = os.path.dirname(os.path.abspath(inspect.getsourcefile(lambda:0)))
 sys.path.append(a + '/../')
 sys.path.append(a + '/../vis/')
-os.chdir(a)
+sys.path.append(a + '/../cExtension/')
+
+useCLib = True
 
 from VPyDraw import *
 
@@ -33,7 +35,7 @@ def main():
     #electron2.initDraw(1, 5000)
     #points(pos=e2center, size=5, color=color.red)
 
-    Field = Fields(windObj1, dt, [wireCoils], [electron1])#, electron2]) #Mandatory - create a "wrapper" for everything
+    Field = Fields(windObj1, dt, [wireCoils], [electron1], useC=useCLib)#, electron2]) #Mandatory - create a "wrapper" for everything
     #Arguments: (window to draw to, time step, B field producing objects, particles)
     
     for i in [[-5,3.5,0],[-5,0,3.5],[-5,-3.5,0],[-5,0,-3.5]]: #Optional - draws B Field Lines starting at four points listed to the left
