@@ -339,7 +339,7 @@ class WireCoilPair(object):
         funcArgs[8] = PartObj.p[1]
         funcArgs[9] = PartObj.p[2]
 
-        return fourthOrderRungeKutta_dy(self.Fwrapper, funcArgs)
+        return fourthOrderRungeKutta_dy(self.Fwrapper, funcArgs) / 2
 
 class GenericB(object):
     """Define a generic B at passed in location/time.
